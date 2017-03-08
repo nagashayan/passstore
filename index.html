@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <script src="pouchdb-6.1.2.min.js"></script>
+
   </head>
   <body>
     <h1>Hello World!</h1>
@@ -10,6 +12,17 @@
     We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
+    We are using pouchdb
+    
+    <script>
+    var movies = new PouchDB('Movies');
+
+
+    movies.info().then(function (info) {
+      document.write(JSON.stringify(info));
+     });
+  </script>
+
   </body>
 
   <script>
