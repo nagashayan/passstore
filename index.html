@@ -1,98 +1,262 @@
 <!DOCTYPE html>
-<html ng-app="studentApp">
-  <head>
+<html ng-app="keepassApp">
+
+<head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
     <!-- Insert this line above script imports  -->
-<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script>
+        if (typeof module === 'object') {
+            window.module = module;
+            module = undefined;
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <!-- Insert this line after script imports -->
-    <script>if (window.module) module = window.module;</script>
+    <script>
+        if (window.module) module = window.module;
+    </script>
     <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="pouchdb-6.1.2.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="pouchdb-6.1.2.min.js"></script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
 </head>
 
-  </head>
-  <body ng-controller="studentController">
-   <div class="container">
-   <div class="row">
-    <div class="col-sm-12">
-     <h1>Student Information:</h1>
-     <form ng-submit="submitStudentForm()" >
-             <label for="name" >Name: </label><br />
-             <input type="text" id="name" ng-model="name" /> <br />
+</head>
 
-             <label for="url">Url</label><br />
-                 <input type="text" id="url" ng-model="student.url" /> <br />
-             <label for="passwrod" >Password</label><br />
-                 <input type="text" id="password" ng-model="student.password" /> <br /><br />
+<body ng-controller="keepassController">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>keepass Information:</h1>
+                <form ng-submit="submitkeepassForm()">
+                    <label for="name">Name: </label><br />
+                    <input type="text" id="name" ng-model="record.name" /> <br />
 
-         <input type="submit" value="Submit" />
-         <input type="reset" ng-click="resetForm()" value="Reset" /> <br />
+                    <label for="url">Url</label><br />
+                    <input type="text" id="url" ng-model="record.url" /> <br />
+                    <label for="passwrod">Password</label><br />
+                    <input type="text" id="password" ng-model="record.password" /> <br /><br />
 
-     </form>
-     <p>{{myTxt}}</p>
-    </div>
-   </div>
+                    <input type="submit" value="Submit" />
+                    <input type="reset" ng-click="resetForm()" value="Reset" /> <br />
 
-   <div class="row">
-    <div class="col-sm-12">
-     <!-- All of the Node.js APIs are available in this renderer process. -->
-     We are using Node.js <script>document.write(process.versions.node)</script>,
-     Chromium <script>document.write(process.versions.chrome)</script>,
-     and Electron <script>document.write(process.versions.electron)</script>.
-     <p id="pouch-info" style="word-break: break-word;">We are using pouchdb</p>
-     <script>
-     var movies = new PouchDB('Movies'); movies.info().then(function (info) {
-        $("#pouch-info").text($("#pouch-info").text()+JSON.stringify(info));
-      });
-   </script>
-    </div>
-   </div>
+                </form>
+                <p>{{myTxt}}</p>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>URL</th>
+                                <th>password</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="(index, object) in data">
+                                <td>{{ object.name }}</td>
+                                <td>{{ object.url }}</td>
+                                <td>{{ object.password }}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <!-- All of the Node.js APIs are available in this renderer process. -->
+                    We are using Node.js
+                    <script>
+                        document.write(process.versions.node)
+                    </script>, Chromium
+                    <script>
+                        document.write(process.versions.chrome)
+                    </script>, and Electron
+                    <script>
+                        document.write(process.versions.electron)
+                    </script>.
+                    <p id="pouch-info" style="word-break: break-word;">We are using pouchdb</p>
+                    <script>
+                        var movies = new PouchDB('Movies');
+                        movies.info().then(function(info) {
+                            $("#pouch-info").text($("#pouch-info").text() + JSON.stringify(info));
+                        });
+                    </script>
+                </div>
+            </div>
 
 
 
 
 
-</div>
-  </body>
+        </div>
+</body>
 
-  <script>
-
-
+<script>
     //1. create app module
-       var studentApp = angular.module('studentApp', []);
+    var keepassApp = angular.module('keepassApp', [])
+        .run(function($pouchDB) {
+            $pouchDB.setDatabase("keepassxplus-db");
+        });
 
 
     //2. create controller
-       studentApp.controller("studentController", function ($scope, $http, $log) {
+    keepassApp.controller("keepassController", function($scope, $http, $pouchDB) {
 
-         $scope.myTxt = "You have not yet clicked submit";
-        
+        $scope.myTxt = "You have not yet clicked submit";
 
-           //5. create submitStudentForm() function. This will be called when user submits the form
-           $scope.submitStudentForm = function () {
-             console.log("student record saved"+$scope.name);
-              $scope.myTxt = "You clicked submit!";
-               // send $http request to save student
-           };
+        //set record object properties
+        $scope.record = {
 
-           //6. create resetForm() function. This will be called on Reset button click.
-           $scope.resetForm = function () {
-               $scope.student = angular.copy($scope.OriginalStudent);
-           };
-   });
-   // You can also require other files to run in this process
-   require('./renderer.js')
-  </script>
+            name: null,
+            url: null,
+            password: null
+
+        };
+
+        $scope.data = [];
+
+        //start pouchdb service
+        $pouchDB.startListening();
+
+        //when db changes show it on ui
+        $rootScope.$on("$pouchDB:change", function(event, data) {
+            $scope.data = data.doc;
+            $scope.$apply();
+        });
+
+        $rootScope.$on("$pouchDB:delete", function(event, data) {
+            delete $scope.data[data._id];
+            $scope.$apply();
+        });
+
+        //5. create submitkeepassForm() function. This will be called when user submits the form
+        $scope.submitkeepassForm = function() {
+
+            $scope.myTxt = "You clicked submit!";
+
+            //saving the record
+            if ($scope.record.name) {
+                console.log("keepass record saved" + $scope.record.name);
+                console.log("keepass record saved" + $scope.record.url);
+                var record = {
+                    name: $scope.record.name,
+                    url: $scope.record.url,
+                    password: $scope.record.password
+                };
+                $scope.data.push(record);
+
+                //store the record locally
+                storeData(record);
+
+                //reset form
+                $scope.record.name = '';
+                $scope.record.url = '';
+                $scope.record.password = '';
+            }
+
+        };
+
+        //store the data locally
+        var storeData = function(record) {
+            console.log("storing data locally");
+
+        }
+
+
+
+
+
+        //6. create resetForm() function. This will be called on Reset button click.
+        $scope.resetForm = function() {
+            $scope.keepass = angular.copy($scope.Originalkeepass);
+        };
+    });
+
+    //pouchdb - angularjs service
+    keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
+
+        var database;
+        var changeListener;
+
+        this.setDatabase = function(databaseName) {
+            database = new PouchDB(databaseName);
+            console.log("created new dataabase");
+        }
+
+        this.startListening = function() {
+            console.log("created new dataabase");
+            changeListener = database.changes({
+                live: true,
+                include_docs: true
+            }).on("change", function(change) {
+                if (!change.deleted) {
+                    $rootScope.$broadcast("$pouchDB:change", change);
+                } else {
+                    $rootScope.$broadcast("$pouchDB:delete", change);
+                }
+            });
+        }
+
+        this.stopListening = function() {
+            changeListener.cancel();
+        }
+
+        this.sync = function(remoteDatabase) {
+            database.sync(remoteDatabase, {
+                live: true,
+                retry: true
+            });
+        }
+
+        this.save = function(jsonDocument) {
+            var deferred = $q.defer();
+            if (!jsonDocument._id) {
+                database.post(jsonDocument).then(function(response) {
+                    deferred.resolve(response);
+                }).catch(function(error) {
+                    deferred.reject(error);
+                });
+            } else {
+                database.put(jsonDocument).then(function(response) {
+                    deferred.resolve(response);
+                }).catch(function(error) {
+                    deferred.reject(error);
+                });
+            }
+            return deferred.promise;
+        }
+
+        this.delete = function(documentId, documentRevision) {
+            return database.remove(documentId, documentRevision);
+        }
+
+        this.get = function(documentId) {
+            return database.get(documentId);
+        }
+
+        this.destroy = function() {
+            database.destroy();
+        }
+
+    }]);
+
+    // You can also require other files to run in this process
+    require('./renderer.js')
+</script>
+
 </html>
