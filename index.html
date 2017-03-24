@@ -38,11 +38,15 @@
             <div class="col-sm-12">
                 <h1>keepass Information:</h1>
                 <form ng-submit="submitkeepassForm()">
-                    <label for="name">Name: </label><br />
-                    <input type="text" id="name" ng-model="record.name" /> <br />
+                    <label for="name">Site Name: </label><br />
+                    <input type="text" id="name" ng-model="record.sname" /> <br />
 
                     <label for="url">Url</label><br />
                     <input type="text" id="url" ng-model="record.url" /> <br />
+
+                    <label for="name">Username: </label><br />
+                    <input type="text" id="name" ng-model="record.name" /> <br />
+
                     <label for="passwrod">Password</label><br />
                     <input type="text" id="password" ng-model="record.password" /> <br /><br />
 
@@ -58,8 +62,9 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>Site Name</th>
                                 <th>URL</th>
+                                <th>Username</th>
                                 <th>password</th>
                             </tr>
                         </thead>
@@ -68,6 +73,7 @@
                             <tr ng-repeat="(index, object) in data">
                                 <td>{{ object.name }}</td>
                                 <td>{{ object.url }}</td>
+                                <td>{{ object.name }}</td>
                                 <td>{{ object.password }}</td>
                             </tr>
 
@@ -115,15 +121,16 @@
 
 
     //2. create controller
-    keepassApp.controller("keepassController", function($scope, $http, $pouchDB) {
+    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB) {
 
         $scope.myTxt = "You have not yet clicked submit";
 
         //set record object properties
         $scope.record = {
 
-            name: null,
+            sname: null,
             url: null,
+            name: null,
             password: null
 
         };
@@ -133,16 +140,19 @@
         //start pouchdb service
         $pouchDB.startListening();
 
-        //when db changes show it on ui
+    /*    //when db changes show it on ui
         $rootScope.$on("$pouchDB:change", function(event, data) {
+            console.log("change");
             $scope.data = data.doc;
             $scope.$apply();
         });
 
         $rootScope.$on("$pouchDB:delete", function(event, data) {
+            console.log("delete");
             delete $scope.data[data._id];
             $scope.$apply();
         });
+*/
 
         //5. create submitkeepassForm() function. This will be called when user submits the form
         $scope.submitkeepassForm = function() {
@@ -154,19 +164,23 @@
                 console.log("keepass record saved" + $scope.record.name);
                 console.log("keepass record saved" + $scope.record.url);
                 var record = {
-                    name: $scope.record.name,
+                    sname: $scope.record.sname,
                     url: $scope.record.url,
+                    name: $scope.record.name,
                     password: $scope.record.password
                 };
+
                 $scope.data.push(record);
 
                 //store the record locally
                 storeData(record);
 
                 //reset form
-                $scope.record.name = '';
+                $scope.record.sname = '';
                 $scope.record.url = '';
+                $scope.record.name = '';
                 $scope.record.password = '';
+                record = null;
             }
 
         };
@@ -175,10 +189,14 @@
         var storeData = function(record) {
             console.log("storing data locally");
 
+
+            $pouchDB.save(record).then(function(response) {
+              console.log("saving success");
+            }, function(error) {
+                console.log("ERROR -> " + error);
+            });
+
         }
-
-
-
 
 
         //6. create resetForm() function. This will be called on Reset button click.
