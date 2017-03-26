@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>keepassxPlus</title>
     <!-- Insert this line above script imports  -->
     <script>
         if (typeof module === 'object') {
@@ -28,6 +28,8 @@
     <script src="pouchdb-6.1.2.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+
+    <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css">
 </head>
 
 </head>
@@ -59,26 +61,40 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <table class="table table-hover">
+                    <table class="table table-hover" >
                         <thead>
                             <tr>
                                 <th>Site Name</th>
                                 <th>URL</th>
                                 <th>Username</th>
-                                <th>password</th>
+                                <th>Password</th>
                             </tr>
                         </thead>
                         <tbody>
+                         <tr ng-repeat="row in data">
 
-                            <tr ng-repeat="(index, object) in data">
-                                <td>{{ object.name }}</td>
-                                <td>{{ object.url }}</td>
-                                <td>{{ object.name }}</td>
-                                <td>{{ object.password }}</td>
+                             <td>{{ row.sname }}</td>
+                             <td>{{ row.url }}</td>
+                             <td>{{ row.name }}</td>
+                             <td>{{ row.password }}</td>
+
+                         </tr>
+
+                            <tr ng-repeat="(index, object) in data[0]">
+
+                                <td>{{ object.doc.sname }}</td>
+                                <td>{{ object.doc.url }}</td>
+                                <td>{{ object.doc.name }}</td>
+                                <td>{{ object.doc.password }}</td>
+                                <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
+                                <td><i class="fa fa-trash" aria-hidden="true"></i></td>
+
                             </tr>
+
 
                         </tbody>
                     </table>
+
                 </div>
             </div>
 
@@ -135,24 +151,38 @@
 
         };
 
+
         $scope.data = [];
 
         //start pouchdb service
         $pouchDB.startListening();
 
-    /*    //when db changes show it on ui
-        $rootScope.$on("$pouchDB:change", function(event, data) {
-            console.log("change");
-            $scope.data = data.doc;
-            $scope.$apply();
-        });
+        $scope.init = function(){
+         //init state of a system
+        console.log("init state");
+          //get all database records and push into list output
 
-        $rootScope.$on("$pouchDB:delete", function(event, data) {
-            console.log("delete");
-            delete $scope.data[data._id];
-            $scope.$apply();
-        });
-*/
+          $pouchDB.getAll().then(function(response) {
+            console.log("getting success");
+            console.log(response.rows);
+            $scope.data.push(response.rows);
+            console.log($scope.data[0]);
+
+           // $scope.data.push(JSON.stringify(response.rows));
+          }, function(error) {
+              console.log("ERROR -> " + error);
+          });
+
+
+        }
+        angular.element(document).ready(function () {
+         $scope.init();
+   });
+
+
+       // $scope.init();
+
+
 
         //5. create submitkeepassForm() function. This will be called when user submits the form
         $scope.submitkeepassForm = function() {
@@ -218,6 +248,7 @@
 
         this.startListening = function() {
             console.log("created new dataabase");
+
             changeListener = database.changes({
                 live: true,
                 include_docs: true
@@ -265,6 +296,21 @@
 
         this.get = function(documentId) {
             return database.get(documentId);
+        }
+
+        this.getAll = function() {
+
+          var deferred = $q.defer();
+          database.allDocs({
+            include_docs: true,
+            attachments: true
+          }).then(function (result) {
+              deferred.resolve(result);
+
+          }).catch(function(error) {
+              deferred.reject(error);
+          });
+          return deferred.promise;
         }
 
         this.destroy = function() {
