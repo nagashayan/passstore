@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>keepassxPlus</title>
+
     <!-- Insert this line above script imports  -->
     <script>
         if (typeof module === 'object') {
@@ -11,25 +12,28 @@
             module = undefined;
         }
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <!-- jquery -->
+    <script src="./library/jquery.js" ></script>
     <!-- Insert this line after script imports -->
     <script>
         if (window.module) module = window.module;
     </script>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="./library/bootstrap.css" >
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="./library/bootstrap-theme.css">
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="pouchdb-6.1.2.min.js"></script>
+    <script src="./library/bootstrap.js"></script>
+    <script src="./library/pouchdb-6.1.2.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+    <!-- angularjs-->
+    <script src="./library/angularjs.js"></script>
+    <script src="./angularjs/keepassapp.js"></script>
+    <script src="./angularjs/maincontroller.js"></script>
 
-    <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css">
+
 </head>
 
 </head>
@@ -71,23 +75,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                         <tr ng-repeat="row in data">
+                         <tr ng-show = "isEmpty(data)" ng-repeat="record in data">
 
-                             <td>{{ row.sname }}</td>
-                             <td>{{ row.url }}</td>
-                             <td>{{ row.name }}</td>
-                             <td>{{ row.password }}</td>
+                             <td>{{ record.sname }}</td>
+                             <td>{{ record.url }}</td>
+                             <td>{{ record.name }}</td>
+                             <td>{{ record.password }}</td>
+                             <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
+                             <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
 
                          </tr>
 
-                            <tr ng-repeat="(index, object) in data[0]">
+                            <tr ng-repeat="(index, record) in data[0]" ng-init = '{{index}} = true'>
 
-                                <td>{{ object.doc.sname }}</td>
-                                <td>{{ object.doc.url }}</td>
-                                <td>{{ object.doc.name }}</td>
-                                <td>{{ object.doc.password }}</td>
+                                <td>{{ record.doc.sname }}</td>
+                                <td>{{ record.doc.url }}</td>
+                                <td>{{ record.doc.name }}</td>
+                                <td>{{ record.doc.password }}</td>
                                 <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                                <td><i class="fa fa-trash" aria-hidden="true"></i></td>
+                                <td><a class="btn" ng-click="show_{{index}} = !show_{{index}}; removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
 
                             </tr>
 
@@ -121,203 +127,16 @@
                 </div>
             </div>
 
-
-
-
-
         </div>
+
+        <!-- font awsesome -->
+        <link rel="stylesheet" href="./library/font-awesome-4.7.0/css/font-awesome.min.css">
 </body>
 
 <script>
-    //1. create app module
-    var keepassApp = angular.module('keepassApp', [])
-        .run(function($pouchDB) {
-            $pouchDB.setDatabase("keepassxplus-db");
-        });
-
-
-    //2. create controller
-    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB) {
-
-        $scope.myTxt = "You have not yet clicked submit";
-
-        //set record object properties
-        $scope.record = {
-
-            sname: null,
-            url: null,
-            name: null,
-            password: null
-
-        };
-
-
-        $scope.data = [];
-
-        //start pouchdb service
-        $pouchDB.startListening();
-
-        $scope.init = function(){
-         //init state of a system
-        console.log("init state");
-          //get all database records and push into list output
-
-          $pouchDB.getAll().then(function(response) {
-            console.log("getting success");
-            console.log(response.rows);
-            $scope.data.push(response.rows);
-            console.log($scope.data[0]);
-
-           // $scope.data.push(JSON.stringify(response.rows));
-          }, function(error) {
-              console.log("ERROR -> " + error);
-          });
-
-
-        }
-        angular.element(document).ready(function () {
-         $scope.init();
-   });
-
-
-       // $scope.init();
 
 
 
-        //5. create submitkeepassForm() function. This will be called when user submits the form
-        $scope.submitkeepassForm = function() {
-
-            $scope.myTxt = "You clicked submit!";
-
-            //saving the record
-            if ($scope.record.name) {
-                console.log("keepass record saved" + $scope.record.name);
-                console.log("keepass record saved" + $scope.record.url);
-                var record = {
-                    sname: $scope.record.sname,
-                    url: $scope.record.url,
-                    name: $scope.record.name,
-                    password: $scope.record.password
-                };
-
-                $scope.data.push(record);
-
-                //store the record locally
-                storeData(record);
-
-                //reset form
-                $scope.record.sname = '';
-                $scope.record.url = '';
-                $scope.record.name = '';
-                $scope.record.password = '';
-                record = null;
-            }
-
-        };
-
-        //store the data locally
-        var storeData = function(record) {
-            console.log("storing data locally");
-
-
-            $pouchDB.save(record).then(function(response) {
-              console.log("saving success");
-            }, function(error) {
-                console.log("ERROR -> " + error);
-            });
-
-        }
-
-
-        //6. create resetForm() function. This will be called on Reset button click.
-        $scope.resetForm = function() {
-            $scope.keepass = angular.copy($scope.Originalkeepass);
-        };
-    });
-
-    //pouchdb - angularjs service
-    keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
-
-        var database;
-        var changeListener;
-
-        this.setDatabase = function(databaseName) {
-            database = new PouchDB(databaseName);
-            console.log("created new dataabase");
-        }
-
-        this.startListening = function() {
-            console.log("created new dataabase");
-
-            changeListener = database.changes({
-                live: true,
-                include_docs: true
-            }).on("change", function(change) {
-                if (!change.deleted) {
-                    $rootScope.$broadcast("$pouchDB:change", change);
-                } else {
-                    $rootScope.$broadcast("$pouchDB:delete", change);
-                }
-            });
-        }
-
-        this.stopListening = function() {
-            changeListener.cancel();
-        }
-
-        this.sync = function(remoteDatabase) {
-            database.sync(remoteDatabase, {
-                live: true,
-                retry: true
-            });
-        }
-
-        this.save = function(jsonDocument) {
-            var deferred = $q.defer();
-            if (!jsonDocument._id) {
-                database.post(jsonDocument).then(function(response) {
-                    deferred.resolve(response);
-                }).catch(function(error) {
-                    deferred.reject(error);
-                });
-            } else {
-                database.put(jsonDocument).then(function(response) {
-                    deferred.resolve(response);
-                }).catch(function(error) {
-                    deferred.reject(error);
-                });
-            }
-            return deferred.promise;
-        }
-
-        this.delete = function(documentId, documentRevision) {
-            return database.remove(documentId, documentRevision);
-        }
-
-        this.get = function(documentId) {
-            return database.get(documentId);
-        }
-
-        this.getAll = function() {
-
-          var deferred = $q.defer();
-          database.allDocs({
-            include_docs: true,
-            attachments: true
-          }).then(function (result) {
-              deferred.resolve(result);
-
-          }).catch(function(error) {
-              deferred.reject(error);
-          });
-          return deferred.promise;
-        }
-
-        this.destroy = function() {
-            database.destroy();
-        }
-
-    }]);
 
     // You can also require other files to run in this process
     require('./renderer.js')
