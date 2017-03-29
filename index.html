@@ -75,25 +75,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                         <tr ng-show = "isEmpty(data)" ng-repeat="record in data">
 
-                             <td>{{ record.sname }}</td>
-                             <td>{{ record.url }}</td>
-                             <td>{{ record.name }}</td>
-                             <td>{{ record.password }}</td>
-                             <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                             <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
 
-                         </tr>
-
-                            <tr ng-repeat="(index, record) in data[0]" ng-init = '{{index}} = true'>
+                            <tr ng-repeat="(index, record) in data[0]" >
 
                                 <td>{{ record.doc.sname }}</td>
                                 <td>{{ record.doc.url }}</td>
                                 <td>{{ record.doc.name }}</td>
                                 <td>{{ record.doc.password }}</td>
                                 <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                                <td><a class="btn" ng-click="show_{{index}} = !show_{{index}}; removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
 
                             </tr>
 

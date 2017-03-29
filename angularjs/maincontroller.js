@@ -21,8 +21,10 @@
         $pouchDB.startListening();
 
         $scope.init = function(){
+
+         $scope.data = [];
          //init state of a system
-        console.log("init state");
+          console.log("init state");
           //get all database records and push into list output
 
           $pouchDB.getAll().then(function(response) {
@@ -63,7 +65,7 @@
                     password: $scope.record.password
                 };
 
-                $scope.data.push(record);
+               // $scope.data.push(record);
 
                 //store the record locally
                 storeData(record);
@@ -96,6 +98,9 @@
 
             $pouchDB.save(record).then(function(response) {
               console.log("saving success");
+
+              //reload database
+              $scope.init();
             }, function(error) {
                 console.log("ERROR -> " + error);
             });
@@ -107,14 +112,17 @@
 
             console.log("removing data locally"+record.doc._id+record.doc._rev);
 
-            /*
+
             $pouchDB.delete(record.doc._id,record.doc._rev).then(function(response) {
               console.log("removing success");
+
+              //reloading database
+              $scope.init();
 
             }, function(error) {
                 console.log("ERROR -> " + error);
             });
-            */
+
 
         }
 
