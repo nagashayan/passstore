@@ -1,6 +1,6 @@
 
     //main controller controller
-    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB) {
+    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB, $filter) {
 
         $scope.myTxt = "You have not yet clicked submit";
 
@@ -11,7 +11,9 @@
             url: null,
             name: null,
             password: null,
-            recordtype: 'new'
+            recordtype: 'new',
+            created_time: null,
+            updated_time: null
 
         };
 
@@ -95,13 +97,15 @@
 
         };
 
-
-
-
         //store the data
         var storeData = function(record) {
             console.log("storing data locally"+record.id+record._id);
              console.log(record);
+             if(record.created_time == null){
+              record.created_time = getCurrentTime();
+              record.updated_time = getCurrentTime();
+             }
+
             $pouchDB.save(record).then(function(response) {
               console.log("saving success");
               console.log(response);
@@ -149,7 +153,7 @@
 
               console.log("before store data");
               console.log(response);
-
+              response.updated_time = getCurrentTime();
               //save the updated record
               storeData(response);
 
@@ -189,4 +193,47 @@
             $scope.record.recordtype = 'new';
             record = null;
         };
+
+
+
+        /*
+
+        password generator
+
+        */
+
+        $scope.passwordLength = 12;
+        $scope.addUpper       = true;
+        $scope.addNumbers     = true;
+        $scope.addSymbols        = false;
+
+        $scope.createPassword = function(){
+            var lowerCharacters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+            var upperCharacters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+            var numbers = ['0','1','2','3','4','5','6','7','8','9'];
+            var symbols = ['!', '"', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'];
+            var finalCharacters = lowerCharacters;
+            if($scope.addUpper){
+                finalCharacters = finalCharacters.concat(upperCharacters);
+            }
+            if($scope.addNumbers){
+                finalCharacters = finalCharacters.concat(numbers);
+            }
+            if($scope.addSymbols){
+                finalCharacters = finalCharacters.concat(symbols);
+            }
+            var passwordArray = [];
+            for (var i = 1; i < $scope.passwordLength; i++) {
+                passwordArray.push(finalCharacters[Math.floor(Math.random() * finalCharacters.length)]);
+            };
+            $scope.record.password = passwordArray.join("");
+        };
+
+
+        /*
+        get current time
+        */
+        var getCurrentTime = function(){
+         return $filter('date')(new Date(), 'dd/MM/yyyy HH:mm:ss')
+        }
     });
