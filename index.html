@@ -57,7 +57,12 @@
                 <button id="signout-button" style="display: none;">Sign Out</button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12" id="content">
 
+
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-8">
                 <form ng-submit="submitkeepassForm()">
@@ -93,28 +98,6 @@
 
                 </form>
 
-
-                <!-- <form>
-                    <label>Site Name</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="SiteName">
-                    </div>
-                    <label for="name">Site Name: </label>
-                    <input type="text"  />
-
-                    <label for="url">Url</label>
-                    <input type="text"  />
-
-                    <label for="name">Username: </label>
-                    <input type="text"  />
-
-                    <label for="passwrod">Password</label>
-                    <input type="text"  />
-                    <input type="button" value="Generate Password" />
-                    <input type="submit" value="Submit" />
-                    <input type="reset" ng-click="resetForm()" value="Reset" />
-
-                </form> -->
                 <p>{{myTxt}}</p>
 
             </div>
@@ -179,12 +162,7 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-sm-12" id="content">
 
-
-            </div>
-        </div>
 
     </div>
 
@@ -217,6 +195,7 @@
     var signoutButton = document.getElementById('signout-button');
     var FILENAME = "keepassxfile";
     var fileId = null;
+    var access_token = null;
 
     /**
      *  On load, called to load the auth2 library and API client library.
@@ -344,13 +323,13 @@
             type: "application/json"
         }));
 
-        var token = gapi.auth.getToken();
-        console.log("token" + token.access_token);
+        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+        console.log(access_token);
         var up = fileId != null ? '/' + fileId : '';
         $.ajax("https://www.googleapis.com/upload/drive/v2/files" + up + "?uploadType=multipart", {
             data: data,
             headers: {
-                Authorization: 'Bearer ' + token.access_token
+                Authorization: 'Bearer ' + access_token
             },
             contentType: false,
             processData: false,
@@ -364,16 +343,17 @@
 
     function readFile() {
         console.log("readin files");
-        var token = gapi.auth.getToken();
+        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+        console.log(access_token);
         var request = gapi.client.drive.files.get({
             'fileId': fileId
         });
         request.execute(function(resp) {
             if (resp.id) {
-                var token = gapi.auth.getToken();
+               // var token = gapi.auth.getToken();
                 $.ajax(resp.downloadUrl, {
                     headers: {
-                        Authorization: 'Bearer ' + token.access_token
+                        Authorization: 'Bearer ' + access_token
                     },
                     success: function(data) {
 

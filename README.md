@@ -4,3 +4,6 @@
 
 follow this guide
 https://www.fyears.org/2015/06/electron-as-gui-of-python-apps.html
+
+To start python server
+python -m SimpleHTTPServer 8000
