@@ -153,12 +153,7 @@
                     document.write(process.versions.electron)
                 </script>.
                 <p id="pouch-info" style="word-break: break-word;">We are using pouchdb</p>
-                <script>
-                    var movies = new PouchDB('Movies');
-                    movies.info().then(function(info) {
-                        $("#pouch-info").text($("#pouch-info").text() + JSON.stringify(info));
-                    });
-                </script>
+               
             </div>
         </div>
 

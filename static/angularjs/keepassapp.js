@@ -13,7 +13,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
 
     this.setDatabase = function(databaseName) {
         database = new PouchDB(databaseName);
-        console.log("created new dataabase");
+        console.log("created new dataabase"+databaseName);
     }
 
     this.startListening = function() {
