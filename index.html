@@ -31,8 +31,10 @@
     <!-- angularjs-->
     <script src="/static/angularjs.js"></script>
     <script src="/static/angularjs/keepassapp.js"></script>
+    <script src="/static/angularjs/googledriveservice.js"></script>
     <script src="/static/angularjs/maincontroller.js"></script>
     <script src="/static/client.js"></script>
+   
 
 
 </head>
@@ -113,6 +115,8 @@
                             <th>Password</th>
                             <th>Created</th>
                             <th>Updated</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,16 +147,6 @@
             <div class="col-sm-12">
                 <!-- All of the Node.js APIs are available in this renderer process. -->
                 We are using Node.js
-                <script>
-                    document.write(process.versions.node)
-                </script>, Chromium
-                <script>
-                    document.write(process.versions.chrome)
-                </script>, and Electron
-                <script>
-                    document.write(process.versions.electron)
-                </script>.
-                <p id="pouch-info" style="word-break: break-word;">We are using pouchdb</p>
                
             </div>
         </div>

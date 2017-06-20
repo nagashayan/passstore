@@ -1,6 +1,6 @@
 
     //main controller controller
-    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB, $filter) {
+    keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB, $filter, $googledrive) {
 
         $scope.myTxt = "You have not yet clicked submit";
 
@@ -23,16 +23,67 @@
         //start pouchdb service
         $pouchDB.startListening();
 
+        /* check if data in drive and local db is in sync or no 
+        * return true if sync 
+        * false if not in sync
+        */
+        var dataUpToDate = function(){
+            return false;
+        }
+
+        var saveToDrive = function(recently_updated_data){
+
+            console.log("saving to drive");
+
+            //convert it into json format
+             recently_updated_data_json = JSON.stringify(recently_updated_data);
+             console.log(recently_updated_data_json);
+
+             //check if driveisuptodate with local pouchdb else sync both
+             if(!dataUpToDate()){
+
+                console.log("data not in sync");
+
+
+
+
+             }
+
+        }
+
         $scope.init = function(){
 
+        
+         //$pouchDB.destroy();
+         console.log("destroyed database");
          $scope.data = [];
          //init state of a system
           console.log("init state");
           //get all database records and push into list output
 
           $pouchDB.getAll().then(function(response) {
-            console.log("getting success");
+            console.log("getting all docs success");
             console.log(response.rows);
+            saveToDrive(response.rows);
+           
+        /*  $pouchDB.bulkGetAll().then(function(resp) {
+             console.log("bulk get all sucess");
+             console.log(resp);
+            }, function(error) {
+                console.log("ERROR11 -> " + error);
+            });
+        */
+            //try saving this response - to test as if we got this from google drive
+           /* $pouchDB.putAll(JSON.parse(response.rows)).then(function(response) {
+              console.log("putting success");
+              console.log(response);
+              }, function(error) {
+                  console.log("ERROR -> " + error);
+              });
+
+*/
+
+            console.log(response.rows[1]);
             $scope.data.push(response.rows);
             console.log($scope.data[0]);
 
@@ -236,4 +287,6 @@
         var getCurrentTime = function(){
          return $filter('date')(new Date(), 'dd/MM/yyyy HH:mm:ss')
         }
+
+
     });

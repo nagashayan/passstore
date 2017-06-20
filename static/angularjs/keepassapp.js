@@ -2,6 +2,8 @@
 var keepassApp = angular.module('keepassApp', [])
     .run(function($pouchDB) {
         $pouchDB.setDatabase("keepassxplus-db");
+
+
     });
 
 
@@ -13,7 +15,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
 
     this.setDatabase = function(databaseName) {
         database = new PouchDB(databaseName);
-        console.log("created new dataabase"+databaseName);
+        console.log("created new dataabase" + databaseName);
     }
 
     this.startListening = function() {
@@ -61,7 +63,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
     }
 
     this.delete = function(documentId, documentRevision) {
-         console.log("removing data locally"+documentId+documentRevision);
+        console.log("removing data locally" + documentId + documentRevision);
         return database.remove(documentId, documentRevision);
     }
 
@@ -71,17 +73,47 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
 
     this.getAll = function() {
 
-      var deferred = $q.defer();
-      database.allDocs({
-        include_docs: true,
-        attachments: true
-      }).then(function (result) {
-          deferred.resolve(result);
+        var deferred = $q.defer();
+        database.allDocs({
+            include_docs: true,
+            attachments: true
+        }).then(function(result) {
+            deferred.resolve(result);
 
-      }).catch(function(error) {
-          deferred.reject(error);
-      });
-      return deferred.promise;
+        }).catch(function(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    }
+
+    /*
+    This function uses different function to get all docs
+    */
+    this.bulkGetAll = function() {
+
+        var deferred = $q.defer();
+        database.bulkGet().then(function(result) {
+         console.log("inside bulk getall");
+         console.log(result);
+            deferred.resolve(result);
+
+        }).catch(function(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    }
+
+    this.putAll = function(docs) {
+
+        var deferred = $q.defer();
+        database.bulkDocs(docs).then(function(result) {
+            deferred.resolve(result);
+
+        }).catch(function(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+
     }
 
     this.destroy = function() {
