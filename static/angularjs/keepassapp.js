@@ -2,9 +2,8 @@
 var keepassApp = angular.module('keepassApp', [])
     .run(function($pouchDB) {
         $pouchDB.setDatabase("keepassxplus-db");
-
-
-    });
+    }
+);
 
 
 //pouchdb - angularjs service
@@ -121,3 +120,4 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function($rootScope, $q) {
     }
 
 }]);
+

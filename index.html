@@ -38,7 +38,7 @@
 
 </head>
 
-<body ng-controller="keepassController">
+<body ng-app='keepassApp' ng-controller="keepassController" id="maincontroller">
     <div class="container">
 
         <div class="row">
@@ -150,10 +150,16 @@
     <!-- font awsesome -->
     <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
     <script src="/static/client.js"></script>
+    <script>
+   
+
+    window.onload = function () {
+    angular.element($('#maincontroller')).scope().handleclient();
+    }
+     
+    </script>
+    <script async defer  src="https://apis.google.com/js/api.js"  onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
 
 </body>
-
-<script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()" onreadystatechange="if (this.readyState === 'complete') this.onload()">
-</script>
-
 </html>

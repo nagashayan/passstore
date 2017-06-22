@@ -1,5 +1,5 @@
 //googledrive - angularjs service
-keepassApp.service("$googledrive", ["$rootScope", "$q", "$window", function($rootScope, $q, $window) {
+keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q) {
 
     console.log("googldrive service started");
 
@@ -24,8 +24,8 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", "$window", function($roo
     /**
      *  On load, called to load the auth2 library and API client library.
      */
-    $window.handleClientLoad = function(){
-        console.log("inside handleclient");
+    this.handleClientLoad = function(){
+        console.log("inside handleclient in service");
         gapi.load('client:auth2', initClient);
     }
 
@@ -190,7 +190,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", "$window", function($roo
         });
     }
 
-    function loadScript() {
+   /* function loadScript() {
         console.log('loadScript');
         // use global document since Angular's $document is weak
         var s = document.createElement('script');
@@ -213,7 +213,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", "$window", function($roo
     }
 
     return deferred.promise;
-
+*/
 
 
 }]);

@@ -1,4 +1,4 @@
-
+ 
     //main controller controller
     keepassApp.controller("keepassController", function($scope, $rootScope, $http, $pouchDB, $filter, $googledrive) {
 
@@ -288,5 +288,9 @@
          return $filter('date')(new Date(), 'dd/MM/yyyy HH:mm:ss')
         }
 
+        $scope.handleclient = function(){
+            console.log("inside handle client");
+            $googledrive.handleClientLoad();
+        }
 
     });
