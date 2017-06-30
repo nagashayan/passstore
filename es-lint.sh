@@ -1,0 +1,1 @@
+eslint --debug --no-ignore --env browser,node angularjs/**
