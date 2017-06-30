@@ -5,37 +5,41 @@ const BrowserWindow = electron.BrowserWindow;
 
 var mainWindow = null;
 
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   //if (process.platform != 'darwin') {
-    app.quit();
+  app.quit();
   //}
 });
 
-app.on('ready', function() {
+app.on('ready', function () {
   // call python?
   var subpy = require('child_process').spawn('python', ['./hello.py']);
   //var subpy = require('child_process').spawn('./dist/hello.exe');
   var rq = require('request-promise');
   var mainAddr = 'http://keepassxplus.com:5000';
 
-  var openWindow = function(){
-    mainWindow = new BrowserWindow({width: 800, height: 600});
+  var openWindow = function () {
+    mainWindow = new BrowserWindow({
+      width: 800,
+      height: 600
+    });
     // mainWindow.loadURL('file://' + __dirname + '/index.html');
     mainWindow.loadURL('http://keepassxplus.com:5000');
     mainWindow.webContents.openDevTools();
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', function () {
       mainWindow = null;
+      //kill python
       subpy.kill('SIGINT');
     });
   };
 
-  var startUp = function(){
+  var startUp = function () {
     rq(mainAddr)
-      .then(function(htmlString){
+      .then(function (htmlString) {
         console.log('server started!');
         openWindow();
       })
-      .catch(function(err){
+      .catch(function (err) {
         //console.log('waiting for the server start...');
         startUp();
       });
