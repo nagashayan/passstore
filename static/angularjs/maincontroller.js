@@ -1,9 +1,17 @@
  //main controller controller
- keepassApp.controller("keepassController", function ($scope, $rootScope, $http, $pouchDB, $filter, $googledrive) {
+ keepassApp.controller('keepassController', function ($scope, $rootScope, $http, $pouchDB, $filter, $googledrive) {
 
-     $scope.myTxt = "You have not yet clicked submit";
+     // Define all variables used here
+     var record = null;
+     var resetForm = null;
+     var dataUpToDate = null;
+     var saveToDrive = null;
+     var log = null;
+     var LOG_ENABLED = true;
 
-     //set record object properties
+     $scope.myTxt = 'You have not yet clicked submit';
+
+     // Set record object properties
      $scope.record = {
 
          sname: null,
@@ -19,29 +27,40 @@
 
      $scope.data = [];
 
-     //start pouchdb service
+     // Start pouchdb service
      $pouchDB.startListening();
 
-     /* check if data in drive and local db is in sync or no 
+     // Reset form to blank state
+     resetForm = function () {
+
+         $scope.record.sname = '';
+         $scope.record.url = '';
+         $scope.record.name = '';
+         $scope.record.password = '';
+         $scope.record.recordtype = 'new';
+         record = null;
+     };
+
+     /* Check if data in drive and local db is in sync or no 
       * return true if sync 
       * false if not in sync
       */
-     var dataUpToDate = function () {
+     dataUpToDate = function () {
          return false;
      }
 
-     var saveToDrive = function (recently_updated_data) {
-
-         console.log("saving to drive");
+     saveToDrive = function (recently_updated_data) {
+         var recently_updated_data_json = null;
+         log("saving to drive");
 
          //convert it into json format
          recently_updated_data_json = JSON.stringify(recently_updated_data);
-         console.log(recently_updated_data_json);
+         log(recently_updated_data_json);
 
          //check if driveisuptodate with local pouchdb else sync both
          if (!dataUpToDate()) {
 
-             console.log("data not in sync");
+             log("data not in sync");
 
          }
 
@@ -51,43 +70,43 @@
 
 
          //$pouchDB.destroy();
-         //console.log("destroyed database");
+         //log("destroyed database");
          $scope.data = [];
-         //init state of a system
-         console.log("init state");
-         //get all database records and push into list output
+         // Init state of a system
+         log("init state");
+         // Get all database records and push into list output
 
          $pouchDB.getAll().then(function (response) {
-             console.log("getting all docs success");
-             console.log(response.rows);
+             log("getting all docs success");
+             log(response.rows);
              saveToDrive(response.rows);
 
              /*  $pouchDB.bulkGetAll().then(function(resp) {
-                  console.log("bulk get all sucess");
-                  console.log(resp);
+                  log("bulk get all sucess");
+                  log(resp);
                  }, function(error) {
-                     console.log("ERROR11 -> " + error);
+                     log("ERROR11 -> " + error);
                  });
              */
              //try saving this response - to test as if we got this from google drive
              /* $pouchDB.putAll(JSON.parse(response.rows)).then(function(response) {
-              console.log("putting success");
-              console.log(response);
+              log("putting success");
+              log(response);
               }, function(error) {
-                  console.log("ERROR -> " + error);
+                  log("ERROR -> " + error);
               });
 
 */
 
-             console.log(response.rows[1]);
+             log(response.rows[1]);
              $scope.data.push(response.rows);
-             console.log($scope.data[0]);
+             log($scope.data[0]);
 
-             //reset form
+             // Reset form
              resetForm();
              // $scope.data.push(JSON.stringify(response.rows));
          }, function (error) {
-             console.log("ERROR -> " + error);
+             log("ERROR -> " + error);
          });
 
 
@@ -100,29 +119,29 @@
      $scope.submitkeepassForm = function () {
 
          $scope.myTxt = "You clicked submit!";
-         console.log($scope);
+         log($scope);
          //saving the record
          if ($scope.record.name) {
-             console.log("keepass record saved" + $scope.record.name);
-             console.log("keepass record saved" + $scope.record.recordtype);
+             log("keepass record saved" + $scope.record.name);
+             log("keepass record saved" + $scope.record.recordtype);
 
 
 
              //store the record locally
              if ($scope.record.recordtype == "new") {
-                 var record = {
+                 record = {
                      sname: $scope.record.sname,
                      url: $scope.record.url,
                      name: $scope.record.name,
                      password: $scope.record.password
                  };
-                 console.log("creating");
+                 log("creating");
                  storeData(record);
 
              } else {
                  //update
-                 console.log("updating");
-                 console.log($scope.record);
+                 log("updating");
+                 log($scope.record);
                  updateData($scope.record);
              }
 
@@ -133,20 +152,20 @@
 
      //store the data
      var storeData = function (record) {
-         console.log("storing data locally" + record.id + record._id);
-         console.log(record);
+         log("storing data locally" + record.id + record._id);
+         log(record);
          if (record.created_time == null) {
              record.created_time = getCurrentTime();
              record.updated_time = getCurrentTime();
          }
 
          $pouchDB.save(record).then(function (response) {
-             console.log("saving success");
-             console.log(response);
+             log("saving success");
+             log(response);
              //reload database
              $scope.init();
          }, function (error) {
-             console.log("ERROR -> " + error);
+             log("ERROR -> " + error);
          });
 
      }
@@ -154,7 +173,7 @@
      //remove the data
      $scope.updateItem = function (record) {
 
-         console.log("updating form" + record.doc._id + record.doc._rev);
+         log("updating form" + record.doc._id + record.doc._rev);
 
 
          $scope.record = {
@@ -171,12 +190,12 @@
 
      var updateData = function (updatedrecord) {
 
-         console.log("updating data locally" + updatedrecord.recordtype);
-         console.log(updatedrecord);
+         log("updating data locally" + updatedrecord.recordtype);
+         log(updatedrecord);
 
          $pouchDB.get(updatedrecord.recordtype).then(function (response) {
-             console.log("getting success");
-             console.log(response);
+             log("getting success");
+             log(response);
 
              //udate record with new values
 
@@ -185,14 +204,14 @@
              response.name = updatedrecord.name;
              response.password = updatedrecord.password;
 
-             console.log("before store data");
-             console.log(response);
+             log("before store data");
+             log(response);
              response.updated_time = getCurrentTime();
              //save the updated record
              storeData(response);
 
          }, function (error) {
-             console.log("ERROR -> " + error);
+             log("ERROR -> " + error);
          });
 
 
@@ -201,41 +220,24 @@
      //remove the data
      $scope.removeItem = function (record) {
 
-         console.log("removing data locally" + record.doc._id + record.doc._rev);
+         log("removing data locally" + record.doc._id + record.doc._rev);
 
 
          $pouchDB.delete(record.doc._id, record.doc._rev).then(function (response) {
-             console.log("removing success");
+             log("removing success");
 
              //reloading database
              $scope.init();
 
          }, function (error) {
-             console.log("ERROR -> " + error);
+             log("ERROR -> " + error);
          });
 
 
      }
 
-     //reset form to blank state
-     var resetForm = function () {
 
-         $scope.record.sname = '';
-         $scope.record.url = '';
-         $scope.record.name = '';
-         $scope.record.password = '';
-         $scope.record.recordtype = 'new';
-         record = null;
-     };
-
-
-
-     /*
-
-     password generator
-
-     */
-
+     // Password generator
      $scope.passwordLength = 12;
      $scope.addUpper = true;
      $scope.addNumbers = true;
@@ -272,8 +274,14 @@
      }
 
      $scope.handleclient = function () {
-         console.log("inside handle client");
+         log("inside handle client");
          $googledrive.handleClientLoad();
+     }
+
+     log = function (text){
+         if(LOG_ENABLED){
+            console.log(text);
+         }
      }
 
  });
