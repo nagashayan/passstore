@@ -67,15 +67,15 @@
                 <form ng-submit="submitkeepassForm()">
                     <div class="form-group">
                         <label for="sitename">Site Name</label>
-                        <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name">
+                        <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name" required>
                     </div>
                     <div class="form-group">
                         <label for="siteurl">Site URL</label>
-                        <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL">
+                        <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL" required>
                     </div>
                     <div class="form-group">
                         <label for="username">User Name</label>
-                        <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name">
+                        <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name" required>
                     </div>
 
                     <div class="row">
@@ -83,7 +83,7 @@
                             <label for="username">Password</label>
                             <div class="input-group">
 
-                                <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password">
+                                <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password" required>
                                 <span class="input-group-btn">
                             <button class="btn btn-default" type="button" ng-click="createPassword(record)">Password Generator!</button>
                           </span>

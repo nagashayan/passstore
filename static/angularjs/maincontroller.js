@@ -44,9 +44,6 @@
 
                 console.log("data not in sync");
 
-
-
-
              }
 
         }

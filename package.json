@@ -4,7 +4,8 @@
   "description": "A minimal Password Manager application",
   "main": "main-python.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "mocha"
   },
   "repository": "https://github.com/nagashayan/keepassxplus",
   "keywords": [
@@ -15,7 +16,8 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron-prebuilt": "*",
-    "request-promise": "*",
-    "pouchdb": "*"
+    "mocha": "^3.4.2",
+    "pouchdb": "*",
+    "request-promise": "^4.2.1"
   }
 }
