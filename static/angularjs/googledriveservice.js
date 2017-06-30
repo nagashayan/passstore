@@ -1,5 +1,5 @@
 //googledrive - angularjs service
-keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q) {
+keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q) {
 
     console.log("googldrive service started");
 
@@ -20,11 +20,11 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
     var fileId = null;
     var access_token = null;
 
-   
+
     /**
      *  On load, called to load the auth2 library and API client library.
      */
-    this.handleClientLoad = function(){
+    this.handleClientLoad = function () {
         console.log("inside handleclient in service");
         gapi.load('client:auth2', initClient);
     }
@@ -38,7 +38,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
             discoveryDocs: DISCOVERY_DOCS,
             clientId: CLIENT_ID,
             scope: SCOPES
-        }).then(function() {
+        }).then(function () {
             // Listen for sign-in state changes.
             gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
@@ -99,7 +99,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
         gapi.client.drive.files.list({
             'q': '\'appdata\' in parents',
             'maxResults': 10
-        }).then(function(response) {
+        }).then(function (response) {
             console.log("Files:");
             appendPre('Files:');
             var files = response.result.items;
@@ -159,7 +159,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
             contentType: false,
             processData: false,
             type: fileId != null ? 'PUT' : 'POST',
-            success: function(data) {
+            success: function (data) {
                 console.log("File written");
             }
         });
@@ -173,14 +173,14 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
         var request = gapi.client.drive.files.get({
             'fileId': fileId
         });
-        request.execute(function(resp) {
+        request.execute(function (resp) {
             if (resp.id) {
-               // var token = gapi.auth.getToken();
+                // var token = gapi.auth.getToken();
                 $.ajax(resp.downloadUrl, {
                     headers: {
                         Authorization: 'Bearer ' + access_token
                     },
-                    success: function(data) {
+                    success: function (data) {
 
                         console.log("got data" + JSON.stringify(data));
                         //stateToForm();
@@ -190,7 +190,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function($rootScope, $q)
         });
     }
 
-   /* function loadScript() {
+    /* function loadScript() {
         console.log('loadScript');
         // use global document since Angular's $document is weak
         var s = document.createElement('script');
