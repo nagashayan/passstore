@@ -51,7 +51,7 @@
 
 
          //$pouchDB.destroy();
-         console.log("destroyed database");
+         //console.log("destroyed database");
          $scope.data = [];
          //init state of a system
          console.log("init state");

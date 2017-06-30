@@ -19,5 +19,8 @@
     "mocha": "^3.4.2",
     "pouchdb": "*",
     "request-promise": "^4.2.1"
+  },
+  "dependencies": {
+    "request": "^2.81.0"
   }
 }

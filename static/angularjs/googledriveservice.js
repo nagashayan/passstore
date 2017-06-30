@@ -190,30 +190,4 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q
         });
     }
 
-    /* function loadScript() {
-        console.log('loadScript');
-        // use global document since Angular's $document is weak
-        var s = document.createElement('script');
-        s.src = '//apis.google.com/js/api.js&callback=handleClientLoad';
-        document.body.appendChild(s);
-        console.log(document);
-    }
-
-    var deferred = $q.defer();
-
-    $window.initMap = function () {
-        deferred.resolve();
-    }
-
-    console.log("onlaoding");
-    if ($window.attachEvent) {
-        $window.attachEvent('onload', loadScript);
-    } else {
-        $window.addEventListener('load', loadScript, false);
-    }
-
-    return deferred.promise;
-*/
-
-
 }]);
