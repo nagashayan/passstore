@@ -95,7 +95,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
     /**
      * Print files.
      */
-    function listFiles() {
+    function listFiles(pouchdata) {
         console.log("list files");
         gapi.client.drive.files.list({
             'q': '\'appdata\' in parents',
@@ -111,7 +111,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
                     if (file.title == FILENAME) {
                         fileId = file.id;
                         console.log("fileId" + fileId);
-                        readFile();
+                        readFile(pouchdata);
                         return;
                     }
                 }
@@ -120,16 +120,20 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
                 appendPre('No files found.');
 
                 //create the file
-                createFile();
+                createFile(pouchdata);
 
             }
         });
     }
 
+
     /*
      * create and save the file
      */
-    function createFile() {
+    function createFile(pouchdata) {
+        console.log("pouchdata");
+        // Data to be stored 
+        console.log(pouchdata);
         var metadata = {
             title: FILENAME,
             mimeType: 'application/json',
@@ -137,15 +141,18 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
                 id: 'appdata'
             }]
         }
+        // Remove this
         var filedata = {
             id: 1,
             name: 'naga'
         };
+        console.log("sample data");
+        console.log(filedata);
         data = new FormData();
         data.append("metadata", new Blob([JSON.stringify(metadata)], {
             type: "application/json"
         }));
-        data.append("file", new Blob([JSON.stringify(filedata)], {
+        data.append("file", new Blob([JSON.stringify(pouchdata)], {
             type: "application/json"
         }));
 
@@ -163,21 +170,24 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
             success: function (data) {
                 console.log("File written");
                 // Starts initialization on main controller
-                startInitialization();
+                //startInitialization();
             }
         });
 
     }
 
-    function readFile() {
+    function readFile(pouchdata) {
         console.log("readin files");
         access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
         console.log(access_token);
         var request = gapi.client.drive.files.get({
             'fileId': fileId
         });
+
         request.execute(function (resp) {
             if (resp.id) {
+                // Downloding data from this url
+                console.log("downloading data from " + resp.downloadUrl);
                 // var token = gapi.auth.getToken();
                 $.ajax(resp.downloadUrl, {
                     headers: {
@@ -186,15 +196,25 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
                     success: function (data) {
 
                         console.log("got data" + JSON.stringify(data));
+                        // Create the file anyhow
+                        //createFile(pouchdata);
                         startInitialization();
-                        
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                         // Create the file anyhow
+                        startInitialization();
                     }
                 });
             }
         });
 
     }
-    function startInitialization(){
+
+    function startInitialization() {
         $rootScope.$broadcast('initialize', {});
         console.log('sent init');
     }
@@ -202,6 +222,8 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
     $rootScope.$on('saveToDrive', function (event, data) {
         console.log("received data to be stored");
         console.log(data);
+        // Create the file
+        createFile(data);
     });
 
 
