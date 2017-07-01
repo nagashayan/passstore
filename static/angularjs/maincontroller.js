@@ -47,7 +47,7 @@
       */
      dataUpToDate = function () {
          return false;
-     }
+     };
 
      saveToDrive = function (recently_updated_data) {
          var recently_updated_data_json = null;
@@ -59,12 +59,18 @@
 
          //check if driveisuptodate with local pouchdb else sync both
          if (!dataUpToDate()) {
+             //should check which has latest data
+             log('data not in sync');
 
-             log("data not in sync");
 
+             $rootScope.$broadcast('saveToDrive', {
+                 data: recently_updated_data_json
+             });
+
+             log('sending msg');
          }
 
-     }
+     };
 
      $scope.init = function () {
 
@@ -109,13 +115,13 @@
              log("ERROR -> " + error);
          });
 
+     };
 
-     }
-     angular.element(document).ready(function () {
+     /* angular.element(document).ready(function () {
          $scope.init();
-     });
+     });*/
 
-     //5. create submitkeepassForm() function. This will be called when user submits the form
+     // Create submitkeepassForm() function. This will be called when user submits the form
      $scope.submitkeepassForm = function () {
 
          $scope.myTxt = "You clicked submit!";
@@ -124,8 +130,6 @@
          if ($scope.record.name) {
              log("keepass record saved" + $scope.record.name);
              log("keepass record saved" + $scope.record.recordtype);
-
-
 
              //store the record locally
              if ($scope.record.recordtype == "new") {
@@ -175,7 +179,6 @@
 
          log("updating form" + record.doc._id + record.doc._rev);
 
-
          $scope.record = {
 
              sname: record.doc.sname,
@@ -184,8 +187,6 @@
              password: record.doc.password,
              recordtype: record.doc._id
          };
-
-
      }
 
      var updateData = function (updatedrecord) {
@@ -278,9 +279,15 @@
          $googledrive.handleClientLoad();
      }
 
-     log = function (text){
-         if(LOG_ENABLED){
-            console.log(text);
+     $scope.$on('initialize', function (event) {
+         console.log("received init");
+         $scope.init();
+     });
+
+     // For controlling display of console logs
+     log = function (text) {
+         if (LOG_ENABLED) {
+             console.log(text);
          }
      }
 

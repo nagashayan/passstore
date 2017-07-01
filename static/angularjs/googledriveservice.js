@@ -1,5 +1,6 @@
 //googledrive - angularjs service
-keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q) {
+keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
+
 
     console.log("googldrive service started");
 
@@ -27,7 +28,7 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q
     this.handleClientLoad = function () {
         console.log("inside handleclient in service");
         gapi.load('client:auth2', initClient);
-    }
+    };
 
     /**
      *  Initializes the API client library and sets up sign-in state
@@ -161,6 +162,8 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q
             type: fileId != null ? 'PUT' : 'POST',
             success: function (data) {
                 console.log("File written");
+                // Starts initialization on main controller
+                startInitialization();
             }
         });
 
@@ -183,11 +186,23 @@ keepassApp.service("$googledrive", ["$rootScope", "$q", function ($rootScope, $q
                     success: function (data) {
 
                         console.log("got data" + JSON.stringify(data));
-                        //stateToForm();
+                        startInitialization();
+                        
                     }
                 });
             }
         });
+
     }
+    function startInitialization(){
+        $rootScope.$broadcast('initialize', {});
+        console.log('sent init');
+    }
+
+    $rootScope.$on('saveToDrive', function (event, data) {
+        console.log("received data to be stored");
+        console.log(data);
+    });
+
 
 }]);
