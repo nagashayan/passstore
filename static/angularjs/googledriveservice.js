@@ -111,7 +111,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
                     if (file.title == FILENAME) {
                         fileId = file.id;
                         console.log("fileId" + fileId);
-                        readFile(pouchdata);
+                       // readFile(pouchdata);
                         return;
                     }
                 }
@@ -176,42 +176,50 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
 
     }
 
-    function readFile(pouchdata) {
-        console.log("readin files");
-        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-        console.log(access_token);
-        var request = gapi.client.drive.files.get({
-            'fileId': fileId
-        });
+    /* If response url is valid then will read the file contents
+     */
+    function readFileContents(readfileresponse) {
 
-        request.execute(function (resp) {
-            if (resp.id) {
-                // Downloding data from this url
-                console.log("downloading data from " + resp.downloadUrl);
-                // var token = gapi.auth.getToken();
-                $.ajax(resp.downloadUrl, {
-                    headers: {
-                        Authorization: 'Bearer ' + access_token
-                    },
-                    success: function (data) {
+        // Downloding data from this url
+        console.log("downloading data from " + readfileresponse.downloadUrl);
+        $.ajax(readfileresponse.downloadUrl, {
+            headers: {
+                Authorization: 'Bearer ' + access_token
+            },
+            success: function (data) {
 
-                        console.log("got data" + JSON.stringify(data));
-                        // Create the file anyhow
-                        //createFile(pouchdata);
-                        startInitialization();
+                console.log("got data" + JSON.stringify(data));
+                // Create the file anyhow
+                //createFile(pouchdata);
+                startInitialization();
 
-                    },
-                    error: function (xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status);
-                        console.log(error);
-                         // Create the file anyhow
-                        startInitialization();
-                    }
-                });
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                // Create the file anyhow
+                startInitialization();
             }
         });
 
+    }
+
+    function getFileURL() {
+        console.log("readin files");
+        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+        console.log(access_token);
+        var requestFile = gapi.client.drive.files.get({
+            'fileId': fileId
+        });
+
+        requestFile.execute(function (readfileresponse) {
+            if (readfileresponse.id) {
+                return readfileresponse;
+            }
+
+            return null;
+        });
     }
 
     function startInitialization() {
@@ -219,11 +227,16 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
         console.log('sent init');
     }
 
-    $rootScope.$on('saveToDrive', function (event, data) {
+    $rootScope.$on('saveToDrive', function (event, pouchdata) {
         console.log("received data to be stored");
-        console.log(data);
+        console.log(pouchdata);
         // Create the file
-        createFile(data);
+        var getFileurl = getFileURL();
+        if (!getFileurl()) {
+            createFile(pouchdata);
+        } else {
+            readFileContents();
+        }
     });
 
 
