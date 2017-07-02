@@ -20,31 +20,80 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
     var FILENAME = "keepassxfile";
     var fileId = null;
     var access_token = null;
+    var fileURL = null;
 
-    // Check if google drive File exists
-    function googleDriveDBExists (){
-        console.log('checking if google drive file exists');
-        return false;
-    }
-
-    
-    // Initializes the app DB
-    function initializeDB (){
-        console.log('initializes db');
-
-        if(googleDriveDBExists()){
-            console.log("Reading GD DB into pouch");
-        }
-        
-    }
-    /*
-    * Function Initializes application data & sends init broadcast msg to maincontroller 
-    * to kick off UI initializaton of the app
-    */
-    function startInitialization () {
-        initializeDB();
+    // Sends broadcast message to main controller to update UI
+    function startUpdatingUI (){
         $rootScope.$broadcast('initialize', {});
         console.log('sent init');
+    }
+    /* Replace pouchdb data with google drive data
+    */
+    function UpdatePouchDB (){
+        console.log('updating pouchdb using google drive data');
+        startUpdatingUI();
+    }
+    /* If response url is valid then will read the file contents
+     */
+    function readGoogleDriveDB() {
+
+        // Downloding data from this url
+        console.log("downloading data from " + fileURL);
+        $.ajax(fileURL, {
+            headers: {
+                Authorization: 'Bearer ' + access_token
+            },
+            success: function (data) {
+
+                console.log("got data" + JSON.stringify(data));
+                // Create the file anyhow
+                UpdatePouchDB();
+
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                startUpdatingUI();
+            }
+        });
+
+    }
+    // Check if google drive File exists
+    function getGoogleDriveFile() {
+        console.log('checking if google drive file exists');
+        console.log("readin files");
+        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+        console.log(access_token);
+        var requestFile = gapi.client.drive.files.get({
+            'fileId': fileId
+        });
+
+        requestFile.execute(function (readfileresponse) {
+            if (readfileresponse.id) {
+                fileURL = readfileresponse.downloadUrl;
+                readGoogleDriveDB();
+            }
+            console.log("file doesn't exist");
+            startUpdatingUI();
+        });
+    }
+
+
+    // Initializes the app DB
+    function initializeDB() {
+        console.log('initializes db');
+        getGoogleDriveFile();
+        
+
+    }
+    /*
+     * Function Initializes application data & sends init broadcast msg to maincontroller 
+     * to kick off UI initializaton of the app
+     */
+    function startInitialization() {
+        initializeDB();
+        
     }
 
     /**
@@ -59,7 +108,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
      *  Initializes the API client library and sets up sign-in state
      *  listeners.
      */
-    function initClient () {
+    function initClient() {
         gapi.client.init({
             discoveryDocs: DISCOVERY_DOCS,
             clientId: CLIENT_ID,
@@ -137,7 +186,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
                     if (file.title == FILENAME) {
                         fileId = file.id;
                         console.log("fileId" + fileId);
-                       // readFile(pouchdata);
+                        // readFile(pouchdata);
                         return;
                     }
                 }
@@ -202,35 +251,6 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
 
     }
 
-    /* If response url is valid then will read the file contents
-     */
-    function readFileContents(readfileresponse) {
-
-        // Downloding data from this url
-        console.log("downloading data from " + readfileresponse.downloadUrl);
-        $.ajax(readfileresponse.downloadUrl, {
-            headers: {
-                Authorization: 'Bearer ' + access_token
-            },
-            success: function (data) {
-
-                console.log("got data" + JSON.stringify(data));
-                // Create the file anyhow
-                //createFile(pouchdata);
-                startInitialization();
-
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-                // Create the file anyhow
-                startInitialization();
-            }
-        });
-
-    }
-
     function getFileURL() {
         console.log("readin files");
         access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
@@ -251,12 +271,10 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
     $rootScope.$on('saveToDrive', function (event, pouchdata) {
         console.log("received data to be stored");
         console.log(pouchdata);
-        console.log(pouchdata.data);
-        console.log(pouchdata.data.length);
-        if(pouchdata.data.length > 0){
-            updateGoogleDriveDB(pouchdata);
-        }
-        
+
+        updateGoogleDriveDB(pouchdata);
+
+
     });
 
 

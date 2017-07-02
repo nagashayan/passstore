@@ -51,7 +51,7 @@
 
      saveToDrive = function (recently_updated_data) {
          var recently_updated_data_json = null;
-         log("saving to drive"+recently_updated_data.length);
+         log("saving to drive" + recently_updated_data.length);
 
          //convert it into json format
          recently_updated_data_json = JSON.stringify(recently_updated_data);
@@ -71,8 +71,7 @@
              });
 
              log('sending msg');
-         }
-         else{
+         } else {
              console.log("Outdated data - not synching with GD");
          }
 
@@ -92,7 +91,7 @@
              log("getting all docs success");
              log(response.rows);
 
-             if (response.rows.length > 0){
+             if (response.rows.length > 0) {
                  saveToDrive(response.rows);
              }
 
