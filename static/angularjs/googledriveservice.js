@@ -1,5 +1,5 @@
-//googledrive - angularjs service
-keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
+// Googledrive - angularjs service
+keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
 
 
     console.log("googldrive service started");
@@ -21,6 +21,31 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
     var fileId = null;
     var access_token = null;
 
+    // Check if google drive File exists
+    function googleDriveDBExists (){
+        console.log('checking if google drive file exists');
+        return false;
+    }
+
+    
+    // Initializes the app DB
+    function initializeDB (){
+        console.log('initializes db');
+
+        if(googleDriveDBExists()){
+            console.log("Reading GD DB into pouch");
+        }
+        
+    }
+    /*
+    * Function Initializes application data & sends init broadcast msg to maincontroller 
+    * to kick off UI initializaton of the app
+    */
+    function startInitialization () {
+        initializeDB();
+        $rootScope.$broadcast('initialize', {});
+        console.log('sent init');
+    }
 
     /**
      *  On load, called to load the auth2 library and API client library.
@@ -34,7 +59,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
      *  Initializes the API client library and sets up sign-in state
      *  listeners.
      */
-    function initClient() {
+    function initClient () {
         gapi.client.init({
             discoveryDocs: DISCOVERY_DOCS,
             clientId: CLIENT_ID,
@@ -58,10 +83,11 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
         if (isSignedIn) {
             authorizeButton.style.display = 'none';
             signoutButton.style.display = 'block';
-            listFiles();
+            startInitialization();
         } else {
             authorizeButton.style.display = 'block';
             signoutButton.style.display = 'none';
+            console.log('SOMETHING WRONG WITH SIGN IN');
         }
     }
 
@@ -130,7 +156,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
     /*
      * create and save the file
      */
-    function createFile(pouchdata) {
+    function updateGoogleDriveDB(pouchdata) {
         console.log("pouchdata");
         // Data to be stored 
         console.log(pouchdata);
@@ -168,7 +194,7 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
             processData: false,
             type: fileId != null ? 'PUT' : 'POST',
             success: function (data) {
-                console.log("File written");
+                console.log("File written successfully");
                 // Starts initialization on main controller
                 //startInitialization();
             }
@@ -222,21 +248,15 @@ keepassApp.service("$googledrive", ["$rootScope", function ($rootScope) {
         });
     }
 
-    function startInitialization() {
-        $rootScope.$broadcast('initialize', {});
-        console.log('sent init');
-    }
-
     $rootScope.$on('saveToDrive', function (event, pouchdata) {
         console.log("received data to be stored");
         console.log(pouchdata);
-        // Create the file
-        var getFileurl = getFileURL();
-        if (!getFileurl()) {
-            createFile(pouchdata);
-        } else {
-            readFileContents();
+        console.log(pouchdata.data);
+        console.log(pouchdata.data.length);
+        if(pouchdata.data.length > 0){
+            updateGoogleDriveDB(pouchdata);
         }
+        
     });
 
 

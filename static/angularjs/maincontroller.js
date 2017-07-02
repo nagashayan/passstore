@@ -51,11 +51,14 @@
 
      saveToDrive = function (recently_updated_data) {
          var recently_updated_data_json = null;
-         log("saving to drive");
+         log("saving to drive"+recently_updated_data.length);
 
          //convert it into json format
          recently_updated_data_json = JSON.stringify(recently_updated_data);
          log(recently_updated_data_json);
+         log(recently_updated_data_json);
+
+         log(recently_updated_data_json.length);
 
          //check if driveisuptodate with local pouchdb else sync both
          if (!dataUpToDate()) {
@@ -68,6 +71,9 @@
              });
 
              log('sending msg');
+         }
+         else{
+             console.log("Outdated data - not synching with GD");
          }
 
      };
@@ -85,7 +91,10 @@
          $pouchDB.getAll().then(function (response) {
              log("getting all docs success");
              log(response.rows);
-             saveToDrive(response.rows);
+
+             if (response.rows.length > 0){
+                 saveToDrive(response.rows);
+             }
 
              /*  $pouchDB.bulkGetAll().then(function(resp) {
                   log("bulk get all sucess");
@@ -168,6 +177,7 @@
              log(response);
              //reload database
              $scope.init();
+
          }, function (error) {
              log("ERROR -> " + error);
          });
