@@ -1,38 +1,38 @@
  /* Login controller controller
- * for handling google drive login 
- * uses googledriveauthservice to store user info for entire session 
- */
- keepassApp.controller('loginController', function ($scope, $rootScope, $http, $pouchDB, $filter, $googledriveauthservice) {
+  * for handling google drive login 
+  * uses googledriveauth to store user info for entire session 
+  */
+ keepassApp.controller('loginController', function ($scope, $rootScope, $googledriveauth, $googledriveDB) {
 
-    $scope.userSignedin = false;
+     $scope.userSignedin = false;
      // Once the google library file loads in index.html this function will be called
      $scope.handleclient = function () {
          console.log("inside handle client");
-         $googledriveauthservice.handleClientLoad();
-     }
+         $googledriveauth.handleClientLoad();
+     };
 
      // When authorize/sigin button is clicked
-     $scope.signin = function (){
+     $scope.signin = function () {
          console.log("signing you in");
-         $googledriveauthservice.handleAuthClick();
-         
-     }
+         $googledriveauth.handleAuthClick();
+
+     };
 
      // When signout button is clicked
-     $scope.signout = function (){
+     $scope.signout = function () {
          console.log("signing you out");
-         $googledriveauthservice.handleSignoutClick();
-         
-     }
+         $googledriveauth.handleSignoutClick();
 
-     // After user sign in is successful, broadcast msg from googledriveauthservice
+     };
+
+     // After user sign in is successful, broadcast msg from googledriveauth
      $scope.$on('signedIn', function (event) {
          console.log("After signedin");
          $scope.userSignedin = true;
          $scope.$apply();
      });
 
-     // After user sign out is successful, broadcast msg from googledriveauthservice 
+     // After user sign out is successful, broadcast msg from googledriveauth 
      $scope.$on('signedOut', function (event) {
          console.log("After signedout");
          $scope.userSignedin = false;

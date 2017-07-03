@@ -1,5 +1,5 @@
 // Googledrive - angularjs service
-keepassApp.service('$googledriveauthservice', ['$rootScope', function ($rootScope) {
+keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
 
 
     console.log("googldrive auth service started");
