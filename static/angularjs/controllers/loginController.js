@@ -1,4 +1,7 @@
- //main controller controller
+ /* Login controller controller
+ * for handling google drive login 
+ * uses googledriveauthservice to store user info for entire session 
+ */
  keepassApp.controller('loginController', function ($scope, $rootScope, $http, $pouchDB, $filter, $googledriveauthservice) {
 
     $scope.userSignedin = false;
@@ -22,14 +25,14 @@
          
      }
 
-     // After user sign in is successful 
+     // After user sign in is successful, broadcast msg from googledriveauthservice
      $scope.$on('signedIn', function (event) {
          console.log("After signedin");
          $scope.userSignedin = true;
          $scope.$apply();
      });
 
-     // After user sign out is successful 
+     // After user sign out is successful, broadcast msg from googledriveauthservice 
      $scope.$on('signedOut', function (event) {
          console.log("After signedout");
          $scope.userSignedin = false;
