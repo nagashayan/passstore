@@ -23,13 +23,13 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
     var fileURL = null;
 
     // Sends broadcast message to main controller to update UI
-    function startUpdatingUI (){
+    function startUpdatingUI() {
         $rootScope.$broadcast('initialize', {});
         console.log('sent init');
     }
     /* Replace pouchdb data with google drive data
-    */
-    function UpdatePouchDB (){
+     */
+    function UpdatePouchDB() {
         console.log('updating pouchdb using google drive data');
         startUpdatingUI();
     }
@@ -59,24 +59,82 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
         });
 
     }
-    // Check if google drive File exists
-    function getGoogleDriveFile() {
-        console.log('checking if google drive file exists');
-        console.log("readin files");
-        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-        console.log(access_token);
+
+    /**
+     * Lists out all files and compares with our app file title
+     * to find the match and sets global file ID
+     */
+    function setFileID() {
+        // Create a new Deferred object
+        var deferred = $.Deferred();
+        console.log("list files");
+        gapi.client.drive.files.list({
+            'q': '\'appdata\' in parents',
+            'maxResults': 10
+        }).then(function (response) {
+            console.log("Files:");
+            appendPre('Files:');
+            var files = response.result.items;
+            if (files && files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    appendPre(file.title + ' (' + file.id + ')');
+                    if (file.title == FILENAME) {
+                        fileId = file.id;
+                        console.log("fileId" + fileId);
+                        deferred.resolve();
+                    }
+                }
+            } else {
+                console.log("No files found");
+                appendPre('No files found.');
+                deferred.resolve();
+
+
+            }
+        });
+
+        // Return the Deferred's Promise object
+        return deferred.promise();
+    }
+
+    // Get Googledrive file URL
+    function getGoogleDriveURL() {
         var requestFile = gapi.client.drive.files.get({
             'fileId': fileId
         });
 
         requestFile.execute(function (readfileresponse) {
+            console.log("read file response" +
+                JSON.stringify(readfileresponse));
             if (readfileresponse.id) {
                 fileURL = readfileresponse.downloadUrl;
                 readGoogleDriveDB();
+            } else {
+                console.log("file doesn't exist");
             }
-            console.log("file doesn't exist");
+
             startUpdatingUI();
         });
+    }
+    // Check if google drive File exists
+    function getGoogleDriveFile() {
+        console.log('checking if google drive file exists');
+        console.log("readin files");
+        access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+        //console.log(access_token);
+        console.log(fileId);
+        // If fileId is null then call list files to get file id by title
+        if (fileId === null) {
+            // If  fileId is not set then get fileId first
+            setFileID().done(function () {
+                console.log("function returned file id setting");
+                getGoogleDriveURL();
+            });
+        } else {
+            // If already fileId is set then get URL
+            getGoogleDriveURL();
+        }
     }
 
 
@@ -84,7 +142,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
     function initializeDB() {
         console.log('initializes db');
         getGoogleDriveFile();
-        
+
 
     }
     /*
@@ -93,7 +151,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
      */
     function startInitialization() {
         initializeDB();
-        
+
     }
 
     /**
@@ -166,41 +224,6 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
         var textContent = document.createTextNode(message + '\n');
         pre.appendChild(textContent);
     }
-
-    /**
-     * Print files.
-     */
-    function listFiles(pouchdata) {
-        console.log("list files");
-        gapi.client.drive.files.list({
-            'q': '\'appdata\' in parents',
-            'maxResults': 10
-        }).then(function (response) {
-            console.log("Files:");
-            appendPre('Files:');
-            var files = response.result.items;
-            if (files && files.length > 0) {
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    appendPre(file.title + ' (' + file.id + ')');
-                    if (file.title == FILENAME) {
-                        fileId = file.id;
-                        console.log("fileId" + fileId);
-                        // readFile(pouchdata);
-                        return;
-                    }
-                }
-            } else {
-                console.log("No files found");
-                appendPre('No files found.');
-
-                //create the file
-                createFile(pouchdata);
-
-            }
-        });
-    }
-
 
     /*
      * create and save the file
