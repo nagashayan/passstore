@@ -122,14 +122,17 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
         console.log('checking if google drive file exists');
         console.log("readin files");
         access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-        //console.log(access_token);
+
         console.log(fileId);
         // If fileId is null then call list files to get file id by title
         if (fileId === null) {
             // If  fileId is not set then get fileId first
             setFileID().done(function () {
                 console.log("function returned file id setting");
-                getGoogleDriveURL();
+                // For first time fileId will be null so no need to read url if file id is null
+                if (fileId !== null) {
+                    getGoogleDriveURL();
+                }
             });
         } else {
             // If already fileId is set then get URL

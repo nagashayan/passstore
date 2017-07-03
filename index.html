@@ -30,15 +30,21 @@
 
     <!-- angularjs-->
     <script src="/static/library/angularjs.js"></script>
-    <script src="/static/angularjs/keepassapp.js"></script>
-    <script src="/static/angularjs/googledriveservice.js"></script>
-    <script src="/static/angularjs/maincontroller.js"></script>
+        <script src="/static/angularjs/keepassapp.js"></script>
+
+       <script src="/static/angularjs/services/pouchdbservice.js"></script>
+
+        <script src="/static/angularjs/services/googledriveauthservice.js"></script>
+
+    <script src="/static/angularjs/controllers/maincontroller.js"></script>
+    <script src="/static/angularjs/controllers/loginController.js"></script>
+
 
 </head>
 
 </head>
 
-<body ng-app='keepassApp' ng-controller="keepassController" id="maincontroller">
+<body ng-app='keepassApp' ng-controller="loginController" id="logincontroller">
     <div class="container">
 
         <div class="row">
@@ -47,22 +53,22 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" ng-controller="loginController">
             <div class="col-sm-12 pull-right">
                 <span class="g-signin" data-cookiepolicy="single_host_origin" data-callback="listFiles" data-clientid="168029050025-kquglj6b9ecjnn00tqtp1v7ut29iocis.apps.googleusercontent.com"
                     data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appdata">
                 </span>
                 <!--Add buttons to initiate auth sequence and sign out-->
-                <button id="authorize-button" style="display: none;">Authorize</button>
-                <button id="signout-button" style="display: none;">Sign Out</button>
+                <button id="authorize-button" style="display: none;" ng-click="signin()">Authorize</button>
+                <button id="signout-button" style="display: none;" ng-click="signout()">Sign Out</button>
             </div>
         </div>
+
         <div class="row">
             <div class="col-sm-12" id="content">
-
-
             </div>
         </div>
+
         <div class="row">
             <div class="col-sm-8">
                 <form ng-submit="submitkeepassForm()">
@@ -153,7 +159,7 @@
     <script src="/static/client.js"></script>
     <script>
         window.onload = function () {
-            angular.element($('#maincontroller')).scope().handleclient();
+            angular.element($('#logincontroller')).scope().handleclient();
         }
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onreadystatechange="if (this.readyState === 'complete') this.onload()">
