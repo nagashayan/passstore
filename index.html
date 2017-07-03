@@ -38,10 +38,6 @@
 
     <script src="/static/angularjs/controllers/maincontroller.js"></script>
     <script src="/static/angularjs/controllers/loginController.js"></script>
-
-
-</head>
-
 </head>
 
 <body ng-app='keepassApp' ng-controller="loginController" id="logincontroller">
@@ -49,7 +45,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <h1>keepass Information:</h1>
+                <h1>Keepassxplus Application</h1>
             </div>
         </div>
 
@@ -59,7 +55,7 @@
                     data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appdata">
                 </span>
                 <!--Add buttons to initiate auth sequence and sign out-->
-                <button id="authorize-button" style="display: none;" ng-click="signin()">Authorize</button>
+                <button id="authorize-button" style="display: none;" ng-click="signin()">Sign In</button>
                 <button id="signout-button" style="display: none;" ng-click="signout()">Sign Out</button>
             </div>
         </div>
@@ -69,7 +65,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" ng-show="userSignedin">
             <div class="col-sm-8">
                 <form ng-submit="submitkeepassForm()">
                     <div class="form-group">
@@ -108,7 +104,7 @@
 
             </div>
         </div>
-        <div class="row">
+        <div class="row" ng-show="userSignedin">
             <div class="col-sm-12">
                 <table class="table table-hover">
                     <thead>
@@ -143,13 +139,6 @@
                     </tbody>
                 </table>
 
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12">
-                <!-- All of the Node.js APIs are available in this renderer process. -->
-                We are using Node.js
             </div>
         </div>
     </div>

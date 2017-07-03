@@ -1,6 +1,7 @@
  //main controller controller
  keepassApp.controller('loginController', function ($scope, $rootScope, $http, $pouchDB, $filter, $googledriveauthservice) {
 
+    $scope.userSignedin = false;
      // Once the google library file loads in index.html this function will be called
      $scope.handleclient = function () {
          console.log("inside handle client");
@@ -20,6 +21,20 @@
          $googledriveauthservice.handleSignoutClick();
          
      }
+
+     // After user sign in is successful 
+     $scope.$on('signedIn', function (event) {
+         console.log("After signedin");
+         $scope.userSignedin = true;
+         $scope.$apply();
+     });
+
+     // After user sign out is successful 
+     $scope.$on('signedOut', function (event) {
+         console.log("After signedout");
+         $scope.userSignedin = false;
+         $scope.$apply();
+     });
 
 
  });

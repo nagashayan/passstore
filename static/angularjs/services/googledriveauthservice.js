@@ -60,9 +60,11 @@ keepassApp.service('$googledriveauthservice', ['$rootScope', function ($rootScop
         if (isSignedIn) {
             authorizeButton.style.display = 'none';
             signoutButton.style.display = 'block';
+            $rootScope.$broadcast('signedIn', {});
         } else {
             authorizeButton.style.display = 'block';
             signoutButton.style.display = 'none';
+            $rootScope.$broadcast('signedOut', {});
         }
     }
 
