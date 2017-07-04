@@ -31,119 +31,118 @@
     <!-- angularjs-->
     <script src="/static/library/angularjs.js"></script>
     <script src="/static/angularjs/keepassapp.js"></script>
-    <script src="/static/angularjs/googledriveservice.js"></script>
-    <script src="/static/angularjs/maincontroller.js"></script>
 
+    <script src="/static/angularjs/services/pouchdb.js"></script>
+
+    <script src="/static/angularjs/services/googledriveauth.js"></script>
+    <script src="/static/angularjs/services/googledriveDB.js"></script>
+
+    <script src="/static/angularjs/controllers/loginController.js"></script>
+    <script src="/static/angularjs/controllers/DBController.js"></script>
 </head>
 
-</head>
-
-<body ng-app='keepassApp' ng-controller="keepassController" id="maincontroller">
+<body ng-app='keepassApp' ng-controller="loginController" id="logincontroller">
     <div class="container">
 
         <div class="row">
             <div class="col-sm-12">
-                <h1>keepass Information:</h1>
+                <h1>Keepassxplus Application</h1>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" ng-controller="loginController">
             <div class="col-sm-12 pull-right">
                 <span class="g-signin" data-cookiepolicy="single_host_origin" data-callback="listFiles" data-clientid="168029050025-kquglj6b9ecjnn00tqtp1v7ut29iocis.apps.googleusercontent.com"
                     data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appdata">
                 </span>
                 <!--Add buttons to initiate auth sequence and sign out-->
-                <button id="authorize-button" style="display: none;">Authorize</button>
-                <button id="signout-button" style="display: none;">Sign Out</button>
+                <button id="authorize-button" style="display: none;" ng-click="signin()">Sign In</button>
+                <button id="signout-button" style="display: none;" ng-click="signout()">Sign Out</button>
             </div>
         </div>
+
         <div class="row">
             <div class="col-sm-12" id="content">
-
-
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-8">
-                <form ng-submit="submitkeepassForm()">
-                    <div class="form-group">
-                        <label for="sitename">Site Name</label>
-                        <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="siteurl">Site URL</label>
-                        <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username">User Name</label>
-                        <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name" required>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <label for="username">Password</label>
-                            <div class="input-group">
-
-                                <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password" required>
-                                <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" ng-click="createPassword(record)">Password Generator!</button>
-                          </span>
+        <div ng-show="userSignedin">
+            <div ng-controller="DBController">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <form ng-submit="submitkeepassForm()">
+                            <div class="form-group">
+                                <label for="sitename">Site Name</label>
+                                <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name" required>
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label for="siteurl">Site URL</label>
+                                <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">User Name</label>
+                                <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label for="username">Password</label>
+                                    <div class="input-group">
+
+                                        <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password" required>
+                                        <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="createPassword(record)">Password Generator!</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-default">Save</button>
+                            </div>
+
+                        </form>
+
+                        <p>{{myTxt}}</p>
+
                     </div>
-                    <br/>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-default">Save</button>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Site Name</th>
+                                    <th>URL</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr ng-repeat="(index, record) in data[0]">
+
+                                    <td>{{ record.doc.sname }}</td>
+                                    <td>{{ record.doc.url }}</td>
+                                    <td>{{ record.doc.name }}</td>
+                                    <td>{{ record.doc.password }}</td>
+                                    <td>{{ record.doc.created_time }}</td>
+                                    <td>{{ record.doc.updated_time }}</td>
+
+                                    <td><a class="btn" ng-click="updateItem(record)"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
+                                    <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+
                     </div>
-
-                </form>
-
-                <p>{{myTxt}}</p>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Site Name</th>
-                            <th>URL</th>
-                            <th>Username</th>
-                            <th>Password</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-
-                        <tr ng-repeat="(index, record) in data[0]">
-
-                            <td>{{ record.doc.sname }}</td>
-                            <td>{{ record.doc.url }}</td>
-                            <td>{{ record.doc.name }}</td>
-                            <td>{{ record.doc.password }}</td>
-                            <td>{{ record.doc.created_time }}</td>
-                            <td>{{ record.doc.updated_time }}</td>
-
-                            <td><a class="btn" ng-click="updateItem(record)"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
-                            <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
-
-                        </tr>
-
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12">
-                <!-- All of the Node.js APIs are available in this renderer process. -->
-                We are using Node.js
+                </div>
             </div>
         </div>
     </div>
@@ -153,7 +152,7 @@
     <script src="/static/client.js"></script>
     <script>
         window.onload = function () {
-            angular.element($('#maincontroller')).scope().handleclient();
+            angular.element($('#logincontroller')).scope().handleclient();
         }
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onreadystatechange="if (this.readyState === 'complete') this.onload()">
