@@ -55,9 +55,9 @@
          // Start pouchdb service
          $pouchDB.startListening();
          // Check if there is googledriveDB and intialize fileID
-         $googledriveDB.isGoogleDriveFileExists().then(function (response) {
-             console.log("after setting id in db controller" + $googledriveDB.getFileId() + response);
-             if ($googledriveDB.getFileId() === null) {
+         $googledriveDB.isGoogleDriveFileExists().then(function (fileId) {
+             console.log("after setting id in db controller" + fileId);
+             if (fileId === null) {
                  console.log("file doesn't exist");
              } else {
                  //as of now assuming this works will move forward and come back
@@ -72,10 +72,11 @@
                  });
 
              }
+             //temporarily 
+            $scope.init();
          });
 
-         //temporarily 
-         $scope.init();
+         
      }
 
      /*
@@ -159,11 +160,11 @@
          $pouchDB.getAll().then(function (response) {
              console.log("getting all docs success");
              console.log(response.rows);
-             console.log(response.rows[1]);
+             //console.log(response.rows[1]);
              $scope.data.push(response.rows);
-             console.log($scope.data[0]);
+             //console.log($scope.data[0]);
              if (response.rows.length > 0) {
-                 //saveToDrive(response.rows);
+                 saveToDrive(response.rows);
              }
 
              // Reset form

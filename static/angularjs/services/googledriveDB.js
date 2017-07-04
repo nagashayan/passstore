@@ -1,5 +1,5 @@
 // Googledrive - angularjs service
-keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
+keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, $q) {
 
 
     console.log("googldriveDB service started");
@@ -132,9 +132,9 @@ keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
      * create and save the file
      */
     function updateGoogleDriveDB(pouchdata) {
-        console.log("pouchdata");
+        console.log("updating pouchdata into file"+fileId);
         // Data to be stored 
-        console.log(pouchdata);
+        //console.log(pouchdata);
         var metadata = {
             title: FILENAME,
             mimeType: 'application/json',
@@ -160,6 +160,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
         access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
         console.log(access_token);
         var up = fileId != null ? '/' + fileId : '';
+        console.log("up =="+up);
         $.ajax("https://www.googleapis.com/upload/drive/v2/files" + up + "?uploadType=multipart", {
             data: data,
             headers: {
@@ -211,15 +212,15 @@ keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
                     var file = files[i];
                     console.log("file info"+file);
                     console.log(file.title + ' (' + file.id + ')');
-                    if (file.title == FILENAME) {
+                    if (file.title === FILENAME) {
                         fileId = file.id;
                         console.log("fileId" + fileId);
-                        deferred.resolve();
+                        deferred.resolve(fileId);
                     }
                 }
             } else {
                 console.log("No files found");
-                deferred.resolve();
+                deferred.resolve(fileId);
             }
         });
 
@@ -240,5 +241,11 @@ keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
     this.saveToDrive = function(pouchdata){
         updateGoogleDriveDB(pouchdata);
     }
+
+    this.getLastUpdatedTimeStamp = function () {
+        var deferred = $q.defer();
+        
+        return deferred.promise;
+    };
 
 }]);
