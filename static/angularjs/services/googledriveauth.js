@@ -29,7 +29,6 @@ keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
      *  On load, called to load the auth2 library and API client library.
      */
     this.handleClientLoad = function () {
-        console.log("inside handleclient in service");
         gapi.load('client:auth2', initClient);
     };
 

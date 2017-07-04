@@ -1,22 +1,9 @@
 // Googledrive - angularjs service
-keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
+keepassApp.service('$googledriveDB', ['$rootScope', function ($rootScope) {
 
 
-    console.log("googldrive service started");
+    console.log("googldriveDB service started");
 
-    //run all basic authentications here
-    // Client ID and API key from the Developer Console
-    var CLIENT_ID = '168029050025-kquglj6b9ecjnn00tqtp1v7ut29iocis.apps.googleusercontent.com';
-
-    // Array of API discovery doc URLs for APIs used by the quickstart
-    var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v2/rest"];
-
-    // Authorization scopes required by the API; multiple scopes can be
-    // included, separated by spaces.
-    var SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-
-    var authorizeButton = document.getElementById('authorize-button');
-    var signoutButton = document.getElementById('signout-button');
     var FILENAME = "keepassxfile";
     var fileId = null;
     var access_token = null;
@@ -117,6 +104,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
             startUpdatingUI();
         });
     }
+
     // Check if google drive File exists
     function getGoogleDriveFile() {
         console.log('checking if google drive file exists');
@@ -138,94 +126,6 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
             // If already fileId is set then get URL
             getGoogleDriveURL();
         }
-    }
-
-
-    // Initializes the app DB
-    function initializeDB() {
-        console.log('initializes db');
-        getGoogleDriveFile();
-
-
-    }
-    /*
-     * Function Initializes application data & sends init broadcast msg to maincontroller 
-     * to kick off UI initializaton of the app
-     */
-    function startInitialization() {
-        initializeDB();
-
-    }
-
-    /**
-     *  On load, called to load the auth2 library and API client library.
-     */
-    this.handleClientLoad = function () {
-        console.log("inside handleclient in service");
-        gapi.load('client:auth2', initClient);
-    };
-
-    /**
-     *  Initializes the API client library and sets up sign-in state
-     *  listeners.
-     */
-    function initClient() {
-        gapi.client.init({
-            discoveryDocs: DISCOVERY_DOCS,
-            clientId: CLIENT_ID,
-            scope: SCOPES
-        }).then(function () {
-            // Listen for sign-in state changes.
-            gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-            // Handle the initial sign-in state.
-            updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-            authorizeButton.onclick = handleAuthClick;
-            signoutButton.onclick = handleSignoutClick;
-        });
-    }
-
-    /**
-     *  Called when the signed in status changes, to update the UI
-     *  appropriately. After a sign-in, the API is called.
-     */
-    function updateSigninStatus(isSignedIn) {
-        if (isSignedIn) {
-            authorizeButton.style.display = 'none';
-            signoutButton.style.display = 'block';
-            startInitialization();
-        } else {
-            authorizeButton.style.display = 'block';
-            signoutButton.style.display = 'none';
-            console.log('SOMETHING WRONG WITH SIGN IN');
-        }
-    }
-
-    /**
-     *  Sign in the user upon button click.
-     */
-    function handleAuthClick(event) {
-        gapi.auth2.getAuthInstance().signIn();
-    }
-
-    /**
-     *  Sign out the user upon button click.
-     */
-    function handleSignoutClick(event) {
-        gapi.auth2.getAuthInstance().signOut();
-    }
-
-    /**
-     * Append a pre element to the body containing the given message
-     * as its text node. Used to display the results of the API call.
-     *
-     * @param {string} message Text to be placed in pre element.
-     */
-    function appendPre(message) {
-        console.log("msg = " + message);
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
     }
 
     /*
@@ -270,8 +170,7 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
             type: fileId != null ? 'PUT' : 'POST',
             success: function (data) {
                 console.log("File written successfully");
-                // Starts initialization on main controller
-                //startInitialization();
+                
             }
         });
 
@@ -294,14 +193,52 @@ keepassApp.service('$googledrive', ['$rootScope', function ($rootScope) {
         });
     }
 
-    $rootScope.$on('saveToDrive', function (event, pouchdata) {
-        console.log("received data to be stored");
-        console.log(pouchdata);
+    /*
+     * Check if google drive file exists by checking filenames
+     */
+    this.isGoogleDriveFileExists = function () {
+        // Create a new Deferred object
+        var deferred = $.Deferred();
+        console.log("searching files");
+        gapi.client.drive.files.list({
+            'q': '\'appdata\' in parents',
+            'maxResults': 10
+        }).then(function (response) {
+            console.log("Files:");
+            var files = response.result.items;
+            if (files && files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    console.log("file info"+file);
+                    console.log(file.title + ' (' + file.id + ')');
+                    if (file.title == FILENAME) {
+                        fileId = file.id;
+                        console.log("fileId" + fileId);
+                        deferred.resolve();
+                    }
+                }
+            } else {
+                console.log("No files found");
+                deferred.resolve();
+            }
+        });
 
+        // Return the Deferred's Promise object
+        return deferred.promise();
+    }
+
+    /**
+     * Returns fileId
+     */
+    this.getFileId = function () {
+        return fileId;
+    }
+
+    /**
+     *  Saves the data to google drive db
+     */
+    this.saveToDrive = function(pouchdata){
         updateGoogleDriveDB(pouchdata);
-
-
-    });
-
+    }
 
 }]);

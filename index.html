@@ -30,13 +30,13 @@
 
     <!-- angularjs-->
     <script src="/static/library/angularjs.js"></script>
-        <script src="/static/angularjs/keepassapp.js"></script>
+    <script src="/static/angularjs/keepassapp.js"></script>
 
-       <script src="/static/angularjs/services/pouchdb.js"></script>
+    <script src="/static/angularjs/services/pouchdb.js"></script>
 
-        <script src="/static/angularjs/services/googledriveauth.js"></script>
+    <script src="/static/angularjs/services/googledriveauth.js"></script>
+    <script src="/static/angularjs/services/googledriveDB.js"></script>
 
-    <script src="/static/angularjs/controllers/maincontroller.js"></script>
     <script src="/static/angularjs/controllers/loginController.js"></script>
     <script src="/static/angularjs/controllers/DBController.js"></script>
 </head>
@@ -65,81 +65,84 @@
             <div class="col-sm-12" id="content">
             </div>
         </div>
+        <div ng-show="userSignedin">
+            <div ng-controller="DBController">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <form ng-submit="submitkeepassForm()">
+                            <div class="form-group">
+                                <label for="sitename">Site Name</label>
+                                <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="siteurl">Site URL</label>
+                                <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">User Name</label>
+                                <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name" required>
+                            </div>
 
-        <div class="row" ng-show="userSignedin">
-            <div class="col-sm-8">
-                <form ng-submit="submitkeepassForm()">
-                    <div class="form-group">
-                        <label for="sitename">Site Name</label>
-                        <input type="text" class="form-control" id="sname" ng-model="record.sname" placeholder="Website Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="siteurl">Site URL</label>
-                        <input type="text" class="form-control" id="url" ng-model="record.url" placeholder="Website URL" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username">User Name</label>
-                        <input type="text" class="form-control" id="name" ng-model="record.name" placeholder="User Name" required>
-                    </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label for="username">Password</label>
+                                    <div class="input-group">
 
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <label for="username">Password</label>
-                            <div class="input-group">
-
-                                <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password" required>
-                                <span class="input-group-btn">
+                                        <input type="text" class="form-control" id="password" ng-model="record.password" placeholder="Password" required>
+                                        <span class="input-group-btn">
                             <button class="btn btn-default" type="button" ng-click="createPassword(record)">Password Generator!</button>
                           </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                            <br/>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-default">Save</button>
+                            </div>
+
+                        </form>
+
+                        <p>{{myTxt}}</p>
+
                     </div>
-                    <br/>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-default">Save</button>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Site Name</th>
+                                    <th>URL</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr ng-repeat="(index, record) in data[0]">
+
+                                    <td>{{ record.doc.sname }}</td>
+                                    <td>{{ record.doc.url }}</td>
+                                    <td>{{ record.doc.name }}</td>
+                                    <td>{{ record.doc.password }}</td>
+                                    <td>{{ record.doc.created_time }}</td>
+                                    <td>{{ record.doc.updated_time }}</td>
+
+                                    <td><a class="btn" ng-click="updateItem(record)"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
+                                    <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+
                     </div>
-
-                </form>
-
-                <p>{{myTxt}}</p>
-
-            </div>
-        </div>
-        <div class="row" ng-show="userSignedin">
-            <div class="col-sm-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Site Name</th>
-                            <th>URL</th>
-                            <th>Username</th>
-                            <th>Password</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-
-                        <tr ng-repeat="(index, record) in data[0]">
-
-                            <td>{{ record.doc.sname }}</td>
-                            <td>{{ record.doc.url }}</td>
-                            <td>{{ record.doc.name }}</td>
-                            <td>{{ record.doc.password }}</td>
-                            <td>{{ record.doc.created_time }}</td>
-                            <td>{{ record.doc.updated_time }}</td>
-
-                            <td><a class="btn" ng-click="updateItem(record)"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
-                            <td><a class="btn" ng-click="removeItem(record)"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
-
-                        </tr>
-
-                    </tbody>
-                </table>
-
+                </div>
             </div>
         </div>
     </div>

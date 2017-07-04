@@ -1,21 +1,295 @@
  /* DB controller controller
- * for handling pouchdb and google drive database CRUD operations 
- * uses pouchdbservice & googledriveDBservice to store user info for entire session 
- */
- keepassApp.controller('DBController', function ($scope, $rootScope, $pouchDB, $googledriveauth) {
+  * for handling pouchdb and google drive database CRUD operations 
+  * uses pouchdbservice & googledriveDBservice to store user info for entire session 
+  */
+ keepassApp.controller('DBController', function ($scope, $rootScope, $pouchDB, $googledriveDB, $filter) {
 
-      // After user sign in is successful, broadcast msg from googledriveauth
+
+     // Define all variables used here
+     var record = null;
+     var resetForm = null;
+     var dataUpToDate = null;
+     var saveToDrive = null;
+
+     $scope.myTxt = 'You have not yet clicked submit';
+
+     // Set record object properties
+     $scope.record = {
+
+         sname: null,
+         url: null,
+         name: null,
+         password: null,
+         recordtype: 'new',
+         created_time: null,
+         updated_time: null
+
+     };
+
+
+     $scope.data = [];
+
+
+     // Password generator
+     $scope.passwordLength = 12;
+     $scope.addUpper = true;
+     $scope.addNumbers = true;
+     $scope.addSymbols = false;
+
+     // After user sign in is successful, broadcast msg from googledriveauth
      $scope.$on('signedIn', function (event) {
          console.log("After signedin received in DBController");
-         $scope.userSignedin = true;
-         $scope.$apply();
+         // Initialize pouchdb
+         initPouchDB();
+
      });
 
      // After user sign out is successful, broadcast msg from googledriveauth 
      $scope.$on('signedOut', function (event) {
          console.log("After signedout received in DBController");
-         $scope.userSignedin = false;
-         $scope.$apply();
+
      });
+
+     // Call googledriveDB service to get info about googledriveDB and see which one is udpated and sync accordingly
+     function initPouchDB() {
+         // Start pouchdb service
+         $pouchDB.startListening();
+         // Check if there is googledriveDB and intialize fileID
+         $googledriveDB.isGoogleDriveFileExists().then(function (response) {
+             console.log("after setting id in db controller" + $googledriveDB.getFileId() + response);
+             if ($googledriveDB.getFileId() === null) {
+                 console.log("file doesn't exist");
+             } else {
+                 //as of now assuming this works will move forward and come back
+                 // If file exists get last updated info of pouchdb
+                 $pouchDB.getLastUpdatedTimeStamp().then(function (pouchlastupdated) {
+                     console.log("last updated" + pouchlastupdated);
+                 });
+
+                 // Get last updated info GoogleDB
+                 $googledriveDB.getLastUpdatedTimeStamp().then(function (googledriveDBlastupdated) {
+                     console.log("last updated" + googledriveDBlastupdated);
+                 });
+
+             }
+         });
+
+         //temporarily 
+         $scope.init();
+     }
+
+     /*
+     get current time
+     */
+     function getCurrentTime() {
+         return $filter('date')(new Date(), 'dd/MM/yyyy HH:mm:ss')
+     }
+
+     $scope.createPassword = function () {
+         var lowerCharacters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+         var upperCharacters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+         var numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+         var symbols = ['!', '"', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'];
+         var finalCharacters = lowerCharacters;
+         if ($scope.addUpper) {
+             finalCharacters = finalCharacters.concat(upperCharacters);
+         }
+         if ($scope.addNumbers) {
+             finalCharacters = finalCharacters.concat(numbers);
+         }
+         if ($scope.addSymbols) {
+             finalCharacters = finalCharacters.concat(symbols);
+         }
+         var passwordArray = [];
+         for (var i = 1; i < $scope.passwordLength; i++) {
+             passwordArray.push(finalCharacters[Math.floor(Math.random() * finalCharacters.length)]);
+         };
+         $scope.record.password = passwordArray.join("");
+     };
+
+
+     // Reset form to blank state
+     resetForm = function () {
+
+         $scope.record.sname = '';
+         $scope.record.url = '';
+         $scope.record.name = '';
+         $scope.record.password = '';
+         $scope.record.recordtype = 'new';
+         record = null;
+     };
+
+     /* Check if data in drive and local db is in sync or no 
+      * return true if sync 
+      * false if not in sync
+      */
+     dataUpToDate = function () {
+         return false;
+     };
+
+     saveToDrive = function (recently_updated_data) {
+         var recently_updated_data_json = null;
+         console.log("saving to drive" + recently_updated_data.length);
+
+         //convert it into json format
+         recently_updated_data_json = JSON.stringify(recently_updated_data);
+         console.log(recently_updated_data_json);
+
+         //check if driveisuptodate with local pouchdb else sync both
+         if (!dataUpToDate()) {
+             //should check which has latest data
+             console.log('data not in sync');
+
+             $googledriveDB.saveToDrive(recently_updated_data_json);
+
+             console.log('calling service to save to drive');
+         } else {
+             console.log("Outdated data - not synching with GD");
+         }
+
+     };
+
+     $scope.init = function () {
+
+         $scope.data = [];
+         // Init state of a system
+         console.log("init state");
+         // Get all database records and push into list output
+
+         $pouchDB.getAll().then(function (response) {
+             console.log("getting all docs success");
+             console.log(response.rows);
+             console.log(response.rows[1]);
+             $scope.data.push(response.rows);
+             console.log($scope.data[0]);
+             if (response.rows.length > 0) {
+                 //saveToDrive(response.rows);
+             }
+
+             // Reset form
+             resetForm();
+             // $scope.data.push(JSON.stringify(response.rows));
+         }, function (error) {
+             console.log("ERROR -> " + error);
+         });
+
+     };
+
+     // Create submitkeepassForm() function. This will be called when user submits the form
+     $scope.submitkeepassForm = function () {
+
+         $scope.myTxt = "You clicked submit!";
+         console.log($scope);
+         //saving the record
+         if ($scope.record.name) {
+             console.log("keepass record saved" + $scope.record.name);
+             console.log("keepass record saved" + $scope.record.recordtype);
+
+             //store the record locally
+             if ($scope.record.recordtype == "new") {
+                 record = {
+                     sname: $scope.record.sname,
+                     url: $scope.record.url,
+                     name: $scope.record.name,
+                     password: $scope.record.password
+                 };
+                 console.log("creating");
+                 storeData(record);
+
+             } else {
+                 //update
+                 console.log("updating");
+                 console.log($scope.record);
+                 updateData($scope.record);
+             }
+
+
+         }
+
+     };
+
+     // Store the data
+     var storeData = function (record) {
+         console.log("storing data locally" + record.id + record._id);
+         console.log(record);
+         if (record.created_time == null) {
+             record.created_time = getCurrentTime();
+             record.updated_time = getCurrentTime();
+         }
+
+         $pouchDB.save(record).then(function (response) {
+             console.log("saving success");
+             console.log(response);
+             //reload database
+             $scope.init();
+
+         }, function (error) {
+             console.log("ERROR -> " + error);
+         });
+
+     }
+
+     //remove the data
+     $scope.updateItem = function (record) {
+
+         console.log("updating form" + record.doc._id + record.doc._rev);
+
+         $scope.record = {
+
+             sname: record.doc.sname,
+             url: record.doc.url,
+             name: record.doc.name,
+             password: record.doc.password,
+             recordtype: record.doc._id
+         };
+     }
+
+     var updateData = function (updatedrecord) {
+
+         console.log("updating data locally" + updatedrecord.recordtype);
+         console.log(updatedrecord);
+
+         $pouchDB.get(updatedrecord.recordtype).then(function (response) {
+             console.log("getting success");
+             console.log(response);
+
+             //udate record with new values
+
+             response.sname = updatedrecord.sname;
+             response.url = updatedrecord.url;
+             response.name = updatedrecord.name;
+             response.password = updatedrecord.password;
+
+             console.log("before store data");
+             console.log(response);
+             response.updated_time = getCurrentTime();
+             //save the updated record
+             storeData(response);
+
+         }, function (error) {
+             console.log("ERROR -> " + error);
+         });
+
+
+     }
+
+     //remove the data
+     $scope.removeItem = function (record) {
+
+         console.log("removing data locally" + record.doc._id + record.doc._rev);
+
+
+         $pouchDB.delete(record.doc._id, record.doc._rev).then(function (response) {
+             console.log("removing success");
+
+             //reloading database
+             $scope.init();
+
+         }, function (error) {
+             console.log("ERROR -> " + error);
+         });
+
+
+     }
 
  });

@@ -8,7 +8,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
     this.setDatabase = function (databaseName) {
         database = new PouchDB(databaseName);
         console.log("created new dataabase" + databaseName);
-    }
+    };
 
     this.startListening = function () {
         console.log("created new dataabase");
@@ -23,18 +23,18 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
                 $rootScope.$broadcast("$pouchDB:delete", change);
             }
         });
-    }
+    };
 
     this.stopListening = function () {
         changeListener.cancel();
-    }
+    };
 
     this.sync = function (remoteDatabase) {
         database.sync(remoteDatabase, {
             live: true,
             retry: true
         });
-    }
+    };
 
     this.save = function (jsonDocument) {
         var deferred = $q.defer();
@@ -52,16 +52,16 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
             });
         }
         return deferred.promise;
-    }
+    };
 
     this.delete = function (documentId, documentRevision) {
         console.log("removing data locally" + documentId + documentRevision);
         return database.remove(documentId, documentRevision);
-    }
+    };
 
     this.get = function (documentId) {
         return database.get(documentId);
-    }
+    };
 
     this.getAll = function () {
 
@@ -76,7 +76,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
             deferred.reject(error);
         });
         return deferred.promise;
-    }
+    };
 
     /*
     This function uses different function to get all docs
@@ -93,7 +93,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
             deferred.reject(error);
         });
         return deferred.promise;
-    }
+    };
 
     this.putAll = function (docs) {
 
@@ -106,10 +106,15 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
         });
         return deferred.promise;
 
-    }
+    };
 
     this.destroy = function () {
         database.destroy();
-    }
+    };
 
+    this.getLastUpdatedTimeStamp = function () {
+        var deferred = $q.defer();
+        deferred.resolve(database.query('updated_time', {descending: true}));
+        return deferred.promise;
+    };
 }]);
