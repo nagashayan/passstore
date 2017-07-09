@@ -8,6 +8,9 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
     var fileId = null;
     var access_token = null;
     var fileURL = null;
+    var filedownloadurl = null;
+    var file_last_modified = null;
+    var file_version = null;
 
     // Sends broadcast message to main controller to update UI
     function startUpdatingUI() {
@@ -65,7 +68,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
             if (files && files.length > 0) {
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
-                    appendPre(file.title + ' (' + file.id + ')');
+                   
                     if (file.title == FILENAME) {
                         fileId = file.id;
                         console.log("fileId" + fileId);
@@ -111,7 +114,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
         console.log("readin files");
         access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
 
-        console.log(fileId);
+        console.log(fileId); //fileId = null;//temporary 
         // If fileId is null then call list files to get file id by title
         if (fileId === null) {
             // If  fileId is not set then get fileId first
@@ -211,6 +214,14 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
                     console.log("file info"+file);
+                    
+                    for(attributes in file){
+                        //console.log("attributes"+attributes);
+                    }
+                    console.log("last modified="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
+                    
+                    file_last_modified = file.modifiedDate;
+                    file_version = file.version;
                     console.log(file.title + ' (' + file.id + ')');
                     if (file.title === FILENAME) {
                         fileId = file.id;
@@ -244,7 +255,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
 
     this.getLastUpdatedTimeStamp = function () {
         var deferred = $q.defer();
-        
+        deferred.resolve(file_last_modified);
         return deferred.promise;
     };
 

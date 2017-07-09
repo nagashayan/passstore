@@ -60,16 +60,20 @@
              if (fileId === null) {
                  console.log("file doesn't exist");
              } else {
+                 console.log("fetching last updated times");
                  //as of now assuming this works will move forward and come back
                  // If file exists get last updated info of pouchdb
-                 $pouchDB.getLastUpdatedTimeStamp().then(function (pouchlastupdated) {
-                     console.log("last updated" + pouchlastupdated);
+                 $pouchDB.getLastUpdatedTimeStamp().then(function (pouchDBlastupdated) {
+                     
+                     pouchDBlastupdated = pouchDBlastupdated.rows;
+                     console.log("last pouchdb updated" + pouchDBlastupdated);
+                     // Get last updated info GoogleDB
+                    $googledriveDB.getLastUpdatedTimeStamp().then(function (googledriveDBlastupdated) {
+                        console.log("last google updated" + googledriveDBlastupdated);
+                    });
                  });
 
-                 // Get last updated info GoogleDB
-                 $googledriveDB.getLastUpdatedTimeStamp().then(function (googledriveDBlastupdated) {
-                     console.log("last updated" + googledriveDBlastupdated);
-                 });
+                 
 
              }
              //temporarily 
@@ -221,6 +225,8 @@
          $pouchDB.save(record).then(function (response) {
              console.log("saving success");
              console.log(response);
+             //update lastupdated timestamp
+             $pouchDB.setLastUpdatedTimeStamp(getCurrentTime());
              //reload database
              $scope.init();
 

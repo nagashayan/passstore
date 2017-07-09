@@ -112,9 +112,42 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
         database.destroy();
     };
 
-    this.getLastUpdatedTimeStamp = function () {
+
+    /*
+    * Sets last updated time stamp of the complete database, we can use that to decide 
+    * weather to sync with google drive or not
+    */ 
+
+    this.setLastUpdatedTimeStamp = function (lastUpdatedTimeStamp) {
         var deferred = $q.defer();
-        deferred.resolve(database.query('updated_time', {descending: true}));
+        console.log("setting last updated timestamp");
+        this.save({
+        _id: 'last_updated',
+        value: lastUpdatedTimeStamp
+        }).then(function (response) {
+        // handle response
+        deferred.resolve(response);
+        }).catch(function (err) {
+         deferred.reject(err);
+        });
+
         return deferred.promise;
+        
     };
+
+    this.getLastUpdatedTimeStamp = function (lastUpdatedTimeStamp) {
+        var deferred = $q.defer();
+
+        this.get('last_updated').then(function (response) {
+        // handle response
+        deferred.resolve(response);
+        }).catch(function (err) {
+         deferred.reject(err);
+        });
+
+        return deferred.promise;
+        
+    };
+    
+
 }]);
