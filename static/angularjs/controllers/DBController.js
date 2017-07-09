@@ -64,17 +64,14 @@
                  //as of now assuming this works will move forward and come back
                  // If file exists get last updated info of pouchdb
                  $pouchDB.getLastUpdatedTimeStamp().then(function (pouchDBlastupdated) {
-                     
-                     pouchDBlastupdated = pouchDBlastupdated.rows;
+                              
+                     pouchDBlastupdated = pouchDBlastupdated.value;
                      console.log("last pouchdb updated" + pouchDBlastupdated);
                      // Get last updated info GoogleDB
                     $googledriveDB.getLastUpdatedTimeStamp().then(function (googledriveDBlastupdated) {
                         console.log("last google updated" + googledriveDBlastupdated);
                     });
                  });
-
-                 
-
              }
              //temporarily 
             $scope.init();
