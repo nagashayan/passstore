@@ -50,7 +50,7 @@
 
      });
 
-     // Call googledriveDB service to get info about googledriveDB and see which one is udpated and sync accordingly
+     // 1. Call googledriveDB service to get info about googledriveDB and see which one is udpated and sync accordingly
      function initPouchDB() {
          // Start pouchdb service
          $pouchDB.startListening();
@@ -84,7 +84,7 @@
      get current time
      */
      function getCurrentTime() {
-         return $filter('date')(new Date(), 'dd/MM/yyyy HH:mm:ss')
+         return $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss')
      }
 
      $scope.createPassword = function () {
@@ -151,6 +151,7 @@
 
      };
 
+     // 2. Once the sync of pouchdb and googledrive is done init UI
      $scope.init = function () {
 
          $scope.data = [];

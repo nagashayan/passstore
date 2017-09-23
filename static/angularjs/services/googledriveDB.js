@@ -218,9 +218,11 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                     for(attributes in file){
                         //console.log("attributes"+attributes);
                     }
-                    console.log("last modified="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
+                    console.log("last modified googledb="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
                     
-                    file_last_modified = file.modifiedDate;
+                    //format date properly
+                    file_last_modified = formatDate(file.modifiedDate);
+                    console.log("modified date after formatting"+file_last_modified);
                     file_version = file.version;
                     console.log(file.title + ' (' + file.id + ')');
                     if (file.title === FILENAME) {
@@ -258,5 +260,13 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
         deferred.resolve(file_last_modified);
         return deferred.promise;
     };
+
+    var formatDate = function(modifieddate){
+        console.log("modifying date");
+        var date = modifieddate.substr(0,10);
+        var time = modifieddate.substr(11,8);
+        console.log(time);
+        return date+ " "+time;
+    }
 
 }]);

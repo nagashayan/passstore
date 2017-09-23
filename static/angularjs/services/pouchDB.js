@@ -136,10 +136,13 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
     };
 
     this.getLastUpdatedTimeStamp = function (lastUpdatedTimeStamp) {
+        console.log("geting pouchdb last updated time");
         var deferred = $q.defer();
 
         this.get('last_updated').then(function (response) {
         // handle response
+        console.log("Response");
+        console.log(response);
         deferred.resolve(response);
         }).catch(function (err) {
          deferred.reject(err);
