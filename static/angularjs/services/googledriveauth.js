@@ -1,8 +1,13 @@
 // Googledrive - angularjs service
 keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
 
-
-    console.log("googldrive auth service started");
+    var logging = false;
+    var log = function(data){
+        if(logging == true){
+            console.log(data);
+        }
+    };
+    log("googldrive auth service started");
 
     //run all basic authentications here
     // Client ID and API key from the Developer Console
@@ -22,8 +27,8 @@ keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
     // Sends broadcast message to main controller to update UI
     function startUpdatingUI() {
         $rootScope.$broadcast('initialize', {});
-        console.log('sent init');
-    }
+        log('sent init');
+    };
     
     /**
      *  On load, called to load the auth2 library and API client library.
@@ -49,7 +54,7 @@ keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
             updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
      
         });
-    }
+    };
 
     /**
      *  Called when the signed in status changes, to update the UI
@@ -65,19 +70,21 @@ keepassApp.service('$googledriveauth', ['$rootScope', function ($rootScope) {
             signoutButton.style.display = 'none';
             $rootScope.$broadcast('signedOut', {});
         }
-    }
+    };
 
     /**
      *  Sign in the user upon button click.
      */
     this.handleAuthClick = function () {
         gapi.auth2.getAuthInstance().signIn();
-    }
+    };
 
     /**
      *  Sign out the user upon button click.
      */
     this.handleSignoutClick = function () {
         gapi.auth2.getAuthInstance().signOut();
-    }
+    };
+
+    
 }]);

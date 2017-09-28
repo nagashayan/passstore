@@ -224,10 +224,10 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                     file_last_modified = formatDate(file.modifiedDate);
                     console.log("modified date after formatting"+file_last_modified);
                     file_version = file.version;
-                    console.log(file.title + ' (' + file.id + ')');
+                    
                     if (file.title === FILENAME) {
                         fileId = file.id;
-                        console.log("fileId" + fileId);
+                        console.log("fileId: " + fileId);
                         deferred.resolve(fileId);
                     }
                 }

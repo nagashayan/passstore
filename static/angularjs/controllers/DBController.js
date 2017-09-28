@@ -62,7 +62,7 @@
              if (fileId === null) {
                  console.log("file doesn't exist");
              } else {
-                 console.log("fetching last updated times");
+                 console.log("fetching last updated files");
                  //as of now assuming this works will move forward and come back
                  // If file exists get last updated info of pouchdb
                  $pouchDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
@@ -158,6 +158,7 @@
          } else {
              console.log("Outdated data - not synching with GD");
              //should get data from google drive and update local pouchdb
+             
          }
 
      };
