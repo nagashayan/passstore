@@ -10,6 +10,8 @@
      var resetForm = null;
      var dataUpToDate = null;
      var saveToDrive = null;
+     var pouchDBlastupdated = null;
+     var googledriveDBlastupdated = null;
 
      $scope.myTxt = 'You have not yet clicked submit';
 
@@ -63,12 +65,13 @@
                  console.log("fetching last updated times");
                  //as of now assuming this works will move forward and come back
                  // If file exists get last updated info of pouchdb
-                 $pouchDB.getLastUpdatedTimeStamp().then(function (pouchDBlastupdated) {
+                 $pouchDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
                               
-                     pouchDBlastupdated = pouchDBlastupdated.value;
+                     pouchDBlastupdated = lastupdated.value;
                      console.log("last pouchdb updated" + pouchDBlastupdated);
                      // Get last updated info GoogleDB
-                    $googledriveDB.getLastUpdatedTimeStamp().then(function (googledriveDBlastupdated) {
+                    $googledriveDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
+                        googledriveDBlastupdated = lastupdated
                         console.log("last google updated" + googledriveDBlastupdated);
                     });
                  });
@@ -84,7 +87,7 @@
      get current time
      */
      function getCurrentTime() {
-         return $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss')
+         return $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
      }
 
      $scope.createPassword = function () {
@@ -126,7 +129,14 @@
       * false if not in sync
       */
      dataUpToDate = function () {
-         return false;
+         console.log("comparing "+pouchDBlastupdated+googledriveDBlastupdated);
+         
+         //if pouchDBlastupdated is null then we are not fetching googledriveDBlastupdated as of now so it will be null and true
+         
+         var d1 = new Date(pouchDBlastupdated);
+         var d2 = new Date(googledriveDBlastupdated);
+         
+         return d1 >= d2;
      };
 
      saveToDrive = function (recently_updated_data) {
@@ -147,6 +157,7 @@
              console.log('calling service to save to drive');
          } else {
              console.log("Outdated data - not synching with GD");
+             //should get data from google drive and update local pouchdb
          }
 
      };

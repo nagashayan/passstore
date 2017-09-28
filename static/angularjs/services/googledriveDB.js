@@ -256,6 +256,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
     }
 
     this.getLastUpdatedTimeStamp = function () {
+        console.log("resolving date"+file_last_modified);
         var deferred = $q.defer();
         deferred.resolve(file_last_modified);
         return deferred.promise;
