@@ -124,8 +124,8 @@
                             <tbody>
 
 
-                                <tr ng-repeat="(index, record) in data[0]">
-
+                                <tr ng-repeat="(index, record) in data[0]" ng-if="record.doc._id != 'last_updated'">
+                                   
                                     <td>{{ record.doc.sname }}</td>
                                     <td>{{ record.doc.url }}</td>
                                     <td>{{ record.doc.name }}</td>

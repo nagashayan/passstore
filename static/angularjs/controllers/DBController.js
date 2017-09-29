@@ -178,7 +178,7 @@
              $scope.data.push(response.rows);
              //console.log($scope.data[0]);
              if (response.rows.length > 0) {
-                 saveToDrive(response.rows);
+                 //saveToDrive(response.rows);
              }
 
              // Reset form

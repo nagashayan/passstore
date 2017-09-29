@@ -218,7 +218,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                     for(attributes in file){
                         //console.log("attributes"+attributes);
                     }
-                    console.log("last modified googledb="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
+                   //console.log("last modified googledb="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
                     
                     //format date properly
                     file_last_modified = formatDate(file.modifiedDate);
@@ -263,10 +263,10 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
     };
 
     var formatDate = function(modifieddate){
-        console.log("modifying date");
+        //console.log("modifying date");
         var date = modifieddate.substr(0,10);
         var time = modifieddate.substr(11,8);
-        console.log(time);
+       
         return date+ " "+time;
     }
 
