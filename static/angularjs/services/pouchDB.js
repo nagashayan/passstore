@@ -68,7 +68,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
         var deferred = $q.defer();
         database.allDocs({
             include_docs: true,
-            attachments: true
+            attachments: false
         }).then(function (result) {
             deferred.resolve(result);
 
@@ -120,7 +120,7 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
 
     this.setLastUpdatedTimeStamp = function (lastUpdatedTimeStamp) {
         var deferred = $q.defer();
-        console.log("setting last updated timestamp");
+        console.log("setting last updated timestamp"+lastUpdatedTimeStamp);
         this.save({
         _id: 'last_updated',
         value: lastUpdatedTimeStamp
