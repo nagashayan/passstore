@@ -175,6 +175,10 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
             success: function (data) {
                 console.log("File written successfully");
                 
+            },
+            error: function (data) {
+                console.log("File written failed");
+                
             }
         });
 
