@@ -9,10 +9,16 @@
      var record = null;
      var resetForm = null;
      var dataUpToDate = null;
-     var saveToDrive = null;
+     var syncDB = null;
      var pouchDBlastupdated = null;
      var googledriveDBlastupdated = null;
-
+     // constants for database sync
+     var databases_uptodate = 1;
+     var databases_pouchdb_uptodate = 2;
+     var databases_gd_uptodate = 3;
+     var TIME_ZONE_DIFF = 240;
+     // Initing in init pouchdb()
+     poucdDBrevid = null;
      $scope.myTxt = 'You have not yet clicked submit';
 
      // Set record object properties
@@ -56,6 +62,7 @@
      function initPouchDB() {
          // Start pouchdb service
          $pouchDB.startListening();
+         //$pouchDB.destroy();
          // Check if there is googledriveDB and intialize fileID
          $googledriveDB.isGoogleDriveFileExists().then(function (fileId) {
              console.log("after setting id in db controller" + fileId);
@@ -68,6 +75,7 @@
                  $pouchDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
                               
                      pouchDBlastupdated = lastupdated.value;
+                     poucdDBrevid = lastupdated._rev
                      console.log("last pouchdb updated" + pouchDBlastupdated);
                      // Get last updated info GoogleDB
                     $googledriveDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
@@ -128,18 +136,30 @@
       * return true if sync 
       * false if not in sync
       */
-     dataUpToDate = function () {
+     localDBUpToDate = function () {
          console.log("comparing "+pouchDBlastupdated+googledriveDBlastupdated);
          
-         //if pouchDBlastupdated is null then we are not fetching googledriveDBlastupdated as of now so it will be null and true
+         //if pouchDBlastupdated is null then we are not fetching googledriveDBlastupdated as of now so it will be null and returns true true
          
          var d1 = new Date(pouchDBlastupdated);
          var d2 = new Date(googledriveDBlastupdated);
          
-         return d1 >= d2;
+         //will consider either of db outdated only if time difference is more than 10 minutes
+         console.log("time difference");
+         var diff = Math.abs(d1 - d2);
+         var minutes = Math.floor((diff/1000)/60);
+         console.log(diff);
+         console.log(minutes);
+         console.log("After time zone diff"+Math.abs(TIME_ZONE_DIFF - minutes));
+         //considering time difference b/w EST and google drive time zone
+         if(Math.abs(TIME_ZONE_DIFF - minutes) <= 10){
+             return databases_uptodate;
+         }
+
+         return databases_pouchdb_uptodate;
      };
 
-     saveToDrive = function (recently_updated_data) {
+     syncDB = function (recently_updated_data) {
          var recently_updated_data_json = null;
          console.log("saving to drive" + recently_updated_data.length);
 
@@ -148,18 +168,24 @@
          console.log(recently_updated_data_json);
 
          //check if driveisuptodate with local pouchdb else sync both
-         if (!dataUpToDate()) {
+         if (localDBUpToDate() == databases_uptodate) {
+            console.log("data up to date");
+         }else if (localDBUpToDate() == databases_pouchdb_uptodate){
              //should check which has latest data
              console.log('data not in sync');
-
+             // Update google drive with new data
+             // Calling service to save to drive
              $googledriveDB.saveToDrive(recently_updated_data_json);
-
-             console.log('calling service to save to drive');
+             // Update local pouchdb date so that next time we can find out both are in sync ( less than 10 min diff)
+             $googledriveDB.getLastUpdatedTimeStamp().then(function(response){
+               //  console.log("setting pouchdb lastupdated time after gd last updated time"+response);
+                $pouchDB.setLastUpdatedTimeStamp(getCurrentTime(),poucdDBrevid);
+             });
          } else {
-             console.log("Outdated data - not synching with GD");
+             console.log("Outdated data in local db update from googledrive");
              //should get data from google drive and update local pouchdb
              
-         }
+        }
 
      };
 
@@ -176,9 +202,9 @@
              console.log(response.rows);
              //console.log(response.rows[1]);
              $scope.data.push(response.rows);
-             //console.log($scope.data[0]);
+             console.log(response.rows.length);
              if (response.rows.length > 0) {
-                 //saveToDrive(response.rows);
+                 syncDB(response.rows);
              }
 
              // Reset form
@@ -225,7 +251,7 @@
 
      // Store the data
      var storeData = function (record) {
-         console.log("storing data locally" + record.id + record._id);
+         console.log("storing data locally" + record._id);
          console.log(record);
          if (record.created_time == null) {
              record.created_time = getCurrentTime();
@@ -236,7 +262,7 @@
              console.log("saving success");
              console.log(response);
              //update lastupdated timestamp
-             $pouchDB.setLastUpdatedTimeStamp(getCurrentTime());
+             $pouchDB.setLastUpdatedTimeStamp(getCurrentTime(), poucdDBrevid);
              //reload database
              $scope.init();
 

@@ -145,13 +145,14 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                 id: 'appdata'
             }]
         }
-        // Remove this
-        var filedata = {
+        // Removed this, may be used as reference in future
+        /*var filedata = {
             id: 1,
             name: 'naga'
         };
         console.log("sample data");
         console.log(filedata);
+        */
         data = new FormData();
         data.append("metadata", new Blob([JSON.stringify(metadata)], {
             type: "application/json"
@@ -220,7 +221,7 @@ keepassApp.service('$googledriveDB', ['$rootScope', '$q', function ($rootScope, 
                     console.log("file info"+file);
                     
                     for(attributes in file){
-                        //console.log("attributes"+attributes);
+                        console.log("attributes"+attributes);
                     }
                    //console.log("last modified googledb="+file.modifiedDate+"last modified by me="+file.modifiedByMeDate+"file version"+file.version);
                     

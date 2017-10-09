@@ -118,19 +118,35 @@ keepassApp.service("$pouchDB", ["$rootScope", "$q", function ($rootScope, $q) {
     * weather to sync with google drive or not
     */ 
 
-    this.setLastUpdatedTimeStamp = function (lastUpdatedTimeStamp) {
+    this.setLastUpdatedTimeStamp = function (lastUpdatedTimeStamp,_revid = null) {
         var deferred = $q.defer();
-        console.log("setting last updated timestamp"+lastUpdatedTimeStamp);
-        this.save({
-        _id: 'last_updated',
-        value: lastUpdatedTimeStamp
-        }).then(function (response) {
-        // handle response
-        deferred.resolve(response);
-        }).catch(function (err) {
-         deferred.reject(err);
-        });
+        console.log("setting last updated timestamp"+lastUpdatedTimeStamp+_revid);
 
+        if( _revid != null){
+            console.log("setting with rev");
+            this.save({
+                _id: 'last_updated',
+                _rev: _revid,
+                value: lastUpdatedTimeStamp
+                }).then(function (response) {
+                // handle response
+                deferred.resolve(response);
+                }).catch(function (err) {
+                deferred.reject(err);
+            });
+    }
+    else{
+            console.log("setting with out rev");
+            this.save({
+                    _id: 'last_updated',
+                    value: lastUpdatedTimeStamp
+                }).then(function (response) {
+                     // handle response
+                    deferred.resolve(response);
+                }).catch(function (err) {
+                    deferred.reject(err);
+            });
+    }
         return deferred.promise;
         
     };
