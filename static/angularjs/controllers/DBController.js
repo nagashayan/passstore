@@ -2,7 +2,7 @@
   * for handling pouchdb and google drive database CRUD operations 
   * uses pouchdbservice & googledriveDBservice to store user info for entire session 
   */
- keepassApp.controller('DBController', function ($scope, $rootScope, $pouchDB, $googledriveDB, $filter) {
+ keepassApp.controller('DBController', function ($scope, $rootScope, $pouchDB, $filter) {
 
 
      // Define all variables used here
@@ -62,33 +62,7 @@
      function initPouchDB() {
          // Start pouchdb service
          $pouchDB.startListening();
-         //$pouchDB.destroy();
-         // Check if there is googledriveDB and intialize fileID
-         $googledriveDB.isGoogleDriveFileExists().then(function (fileId) {
-             console.log("after setting id in db controller" + fileId);
-             if (fileId === null) {
-                 console.log("file doesn't exist");
-             } else {
-                 console.log("fetching last updated files");
-                 //as of now assuming this works will move forward and come back
-                 // If file exists get last updated info of pouchdb
-                 $pouchDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
-                              
-                     pouchDBlastupdated = lastupdated.value;
-                     poucdDBrevid = lastupdated._rev
-                     console.log("last pouchdb updated" + pouchDBlastupdated);
-                     // Get last updated info GoogleDB
-                    $googledriveDB.getLastUpdatedTimeStamp().then(function (lastupdated) {
-                        googledriveDBlastupdated = lastupdated
-                        console.log("last google updated" + googledriveDBlastupdated);
-                    });
-                 });
-             }
-             //temporarily 
-            $scope.init();
-         });
-
-         
+         $scope.init();
      }
 
      /*
@@ -159,36 +133,6 @@
          return databases_pouchdb_uptodate;
      };
 
-     syncDB = function (recently_updated_data) {
-         var recently_updated_data_json = null;
-         console.log("saving to drive" + recently_updated_data.length);
-
-         //convert it into json format
-         recently_updated_data_json = JSON.stringify(recently_updated_data);
-         console.log(recently_updated_data_json);
-
-         //check if driveisuptodate with local pouchdb else sync both
-         if (localDBUpToDate() == databases_uptodate) {
-            console.log("data up to date");
-         }else if (localDBUpToDate() == databases_pouchdb_uptodate){
-             //should check which has latest data
-             console.log('data not in sync');
-             // Update google drive with new data
-             // Calling service to save to drive
-             $googledriveDB.saveToDrive(recently_updated_data_json);
-             // Update local pouchdb date so that next time we can find out both are in sync ( less than 10 min diff)
-             $googledriveDB.getLastUpdatedTimeStamp().then(function(response){
-               //  console.log("setting pouchdb lastupdated time after gd last updated time"+response);
-                $pouchDB.setLastUpdatedTimeStamp(getCurrentTime(),poucdDBrevid);
-             });
-         } else {
-             console.log("Outdated data in local db update from googledrive");
-             //should get data from google drive and update local pouchdb
-             
-        }
-
-     };
-
      // 2. Once the sync of pouchdb and googledrive is done init UI
      $scope.init = function () {
 
@@ -204,7 +148,7 @@
              $scope.data.push(response.rows);
              console.log(response.rows.length);
              if (response.rows.length > 0) {
-                 syncDB(response.rows);
+                 //syncDB(response.rows);
              }
 
              // Reset form
@@ -219,7 +163,6 @@
      // Create submitkeepassForm() function. This will be called when user submits the form
      $scope.submitkeepassForm = function () {
 
-         $scope.myTxt = "You clicked submit!";
          console.log($scope);
          //saving the record
          if ($scope.record.name) {

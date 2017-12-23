@@ -2,7 +2,7 @@
   * for handling google drive login 
   * uses googledriveauth to store user info for entire session 
   */
- keepassApp.controller('loginController', function ($scope, $rootScope, $googledriveauth, $googledriveDB) {
+ keepassApp.controller('loginController', function ($scope, $rootScope, $googledriveauth) {
 
      $scope.userSignedin = false;
      var logging = false;
