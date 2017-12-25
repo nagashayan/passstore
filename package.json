@@ -1,6 +1,6 @@
 {
-  "name": "Keepassxplus-Password-Manager",
-  "version": "1.0.0",
+  "name": "PassStore",
+  "version": "0.0.1",
   "description": "A minimal Password Manager application",
   "main": "main-python.js",
   "scripts": {
@@ -9,10 +9,9 @@
   },
   "repository": "https://github.com/nagashayan/keepassxplus",
   "keywords": [
-    "keepassxplus",
     "passwordmanager"
   ],
-  "author": "Nagashayan",
+  "author": "Nagashayan <passstoresoft@gmail.com>",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron-prebuilt": "*",
